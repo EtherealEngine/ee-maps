@@ -1,0 +1,17 @@
+import { LongLat } from './functions/UnitConversionFunctions'
+import { MapComponentType } from './MapComponent'
+
+// TODO move to functions/
+
+export function getStartCoords(props: MapComponentType): Promise<LongLat> {
+  if (props.useDeviceGeolocation) {
+    return new Promise((resolve, reject) =>
+      navigator.geolocation.getCurrentPosition(({ coords }) => resolve([coords.longitude, coords.latitude]), reject)
+    )
+  }
+  // Default to downtown ATL
+  return Promise.resolve([
+    props.startLongitude ? parseFloat(props.startLongitude) : -84.388,
+    props.startLatitude ? parseFloat(props.startLatitude) : 33.749
+  ])
+}

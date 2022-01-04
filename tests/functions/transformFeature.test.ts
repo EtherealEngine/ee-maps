@@ -1,6 +1,6 @@
 import * as turf from '@turf/turf'
-import { MapTransformedFeature, SupportedFeature } from '../../src/types'
-import type TransformFeature from '../../src/functions/transformFeature'
+import { MapTransformedFeature, SupportedFeature } from '../../engine/types'
+import type TransformFeature from '../../engine/functions/transformFeature'
 import sinon, { SinonSpy } from 'sinon'
 import mock from 'mock-require'
 import assert from 'assert'
@@ -10,7 +10,7 @@ describe('transformFeature', () => {
   let polyFeature: SupportedFeature, lineFeature: SupportedFeature, polyResult: MapTransformedFeature
   let transformFeature: typeof TransformFeature, toMetersFromCenter: SinonSpy, buffer: SinonSpy
   beforeEach(() => {
-    mock('../../src/functions/UnitConversionFunctions', {
+    mock('../../engine/functions/UnitConversionFunctions', {
       toMetersFromCenter: sinon.spy((point) => point)
     })
     mock('@turf/turf', {
@@ -19,12 +19,12 @@ describe('transformFeature', () => {
       bbox: turf.bbox
     })
 
-    toMetersFromCenter = require('../../src/functions/UnitConversionFunctions').toMetersFromCenter
+    toMetersFromCenter = require('../../engine/functions/UnitConversionFunctions').toMetersFromCenter
     buffer = require('@turf/turf').buffer
 
     // need to clear this cache so the module is actually reloaded
-    delete require.cache[require.resolve('../../src/functions/transformFeature')]
-    transformFeature = require('../../src/functions/transformFeature').default
+    delete require.cache[require.resolve('../../engine/functions/transformFeature')]
+    transformFeature = require('../../engine/functions/transformFeature').default
     polyFeature = turf.polygon([
       [
         [20, 20],

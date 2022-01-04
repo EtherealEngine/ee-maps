@@ -3,7 +3,7 @@ import { MapComponentType } from './MapComponent'
 import { addComponent, getComponent } from '@xrengine/engine/src/ecs/functions/ComponentFunctions'
 import { DebugNavMeshComponent } from '@xrengine/engine/src/debug/DebugNavMeshComponent'
 import { Entity } from '@xrengine/engine/src/ecs/classes/Entity'
-import { Group, Mesh } from 'three'
+import { Object3D, Group, Mesh } from 'three'
 import { Engine } from '@xrengine/engine/src/ecs/classes/Engine'
 import { NavMeshComponent } from '@xrengine/engine/src/navigation/component/NavMeshComponent'
 import { MapAction, mapReducer } from './MapReceptor'
@@ -17,19 +17,25 @@ import { ComponentJson } from '@xrengine/common/src/interfaces/SceneInterface'
 import { isClient } from '@xrengine/engine/src/common/functions/isClient'
 import { registerSceneLoadPromise } from '@xrengine/engine/src/scene/functions/SceneLoading'
 import { EntityNodeComponent } from '@xrengine/engine/src/scene/components/EntityNodeComponent'
+import { addChildFast, setPosition } from './util'
+import { debounce } from 'lodash'
 
 export const SCENE_COMPONENT_MAP = 'map'
 export const SCENE_COMPONENT_MAP_DEFAULT_VALUES = {}
 
-export async function deserializeMap(entity: Entity, json: ComponentJson<MapComponentType>): Promise<void> {
+export const deserializeMap = (entity: Entity, json: ComponentJson<MapComponentType>) => {
   if (isClient) {
     registerSceneLoadPromise(createMap(entity, json.props))
     if (Engine.isEditor) getComponent(entity, EntityNodeComponent)?.components.push(SCENE_COMPONENT_MAP)
   }
 }
 
-const createMap = async (entity: Entity, args: MapComponentType) => {
+export const createMap = async (entity: Entity, args: MapComponentType) => {
 
+  if(Engine.isEditor) {
+    _updateMap(entity, args)
+    return
+  }
   // TODO: handle "navigator.geolocation.getCurrentPosition" rejection?
   const center = await getStartCoords(args)
 
@@ -50,7 +56,7 @@ const createMap = async (entity: Entity, args: MapComponentType) => {
   const state = mapReducer(null, MapAction.initialize(center, args.scale?.x))
 
   // TODO fix hardcoded URL
-  const spinnerGLTF = await LoadGLTF(Engine.publicPath + '/projects/default-project/EarthLowPoly.glb')
+  const spinnerGLTF = await LoadGLTF(Engine.publicPath + '/projects/XREngine-Project-Maps/EarthLowPoly.glb')
   const spinner = spinnerGLTF.scene as Mesh
   spinner.position.y = avatarHalfHeight * 2
   spinner.position.z = -150
@@ -86,6 +92,41 @@ const createMap = async (entity: Entity, args: MapComponentType) => {
     navTarget: navigationRaycastTarget
   })
 }
+
+export const _updateMap = async (entity: Entity, props: any) => {
+
+  // only update on some property changes
+  if(!(
+    Object.keys(props).includes('startLatitude')
+    || Object.keys(props).includes('startLongitude')
+    || Object.keys(props).includes('useDeviceGeolocation'))
+  ) return
+
+  const args = getComponent(entity, MapComponent)
+  const center = await getStartCoords(args)
+  const subSceneChildren = []
+  const subScene = this as unknown as Object3D
+
+  const state = mapReducer(null, MapAction.initialize(center, args.scale?.x))
+
+  await startPhases(state, await getPhases({ exclude: ['navigation'] }))
+
+  for (const object of state.completeObjects.values()) {
+    if (object.mesh) {
+      setPosition(object.mesh, object.centerPoint)
+      addChildFast(subScene, object.mesh, subSceneChildren)
+    }
+  }
+  for (const object of state.labelCache.values()) {
+    if (object.mesh) {
+      setPosition(object.mesh, object.centerPoint)
+      addChildFast(subScene, object.mesh, subSceneChildren)
+      object.mesh.update()
+    }
+  }
+  subScene.children = subSceneChildren
+}
+export const updateMap = debounce((entity, args) => _updateMap(entity, args), 500) as any as (entity: Entity, props: any) => void
 
 export const serializeMap = (entity: Entity) => {
   const mapComponent = getComponent(entity, MapComponent)

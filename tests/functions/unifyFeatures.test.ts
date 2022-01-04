@@ -1,6 +1,6 @@
-import unifyFeatures from '../../src/functions/unifyFeatures'
+import unifyFeatures from '../../engine/functions/unifyFeatures'
 import { Feature, Polygon, MultiPolygon } from 'geojson'
-import { scalePolygon, translatePolygon } from '../../src/GeoJSONFns'
+import { scalePolygon, translatePolygon } from '../../engine/GeoJSONFns'
 import polygonClipping from 'polygon-clipping'
 import assert from 'assert'
 

@@ -1,8 +1,8 @@
-import findSplitFeatures from '../../src/functions/findSplitFeatures'
+import findSplitFeatures from '../../engine/functions/findSplitFeatures'
 import { Feature } from 'geojson'
-import { scalePolygon, translatePolygon } from '../../src/GeoJSONFns'
+import { scalePolygon, translatePolygon } from '../../engine/GeoJSONFns'
 import assert from 'assert'
-import FeatureKey from '../../src/classes/FeatureKey'
+import FeatureKey from '../../engine/classes/FeatureKey'
 
 const boxCoords = [
   [-1, -1],

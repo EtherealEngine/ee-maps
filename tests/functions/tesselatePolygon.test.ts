@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { indexedVerticesToGeoJSONTriangles } from '../../src/functions/tesselatePolygon'
+import { indexedVerticesToGeoJSONTriangles } from '../../engine/functions/tesselatePolygon'
 
 describe('indexedVerticesToGeoJSONTriangles', () => {
   it('puts the vertices in order given by the indexes', () => {

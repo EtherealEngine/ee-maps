@@ -1,8 +1,8 @@
 import assert from 'assert'
-import ParametricCache from '../../src/classes/ParametricCache'
-import TileKey from '../../src/classes/TileKey'
-import evictLeastRecentlyUsedItems from '../../src/functions/evictLeastRecentlyUsedItems'
-import {ITuple} from '../../src/types'
+import ParametricCache from '../../engine/classes/ParametricCache'
+import TileKey from '../../engine/classes/TileKey'
+import evictLeastRecentlyUsedItems from '../../engine/functions/evictLeastRecentlyUsedItems'
+import {ITuple} from '../../engine/types'
 
 describe('evictLeastRecentlyUsedItems', () => {
   it('works', () => {

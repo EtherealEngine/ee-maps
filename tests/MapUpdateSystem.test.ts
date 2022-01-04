@@ -12,10 +12,10 @@ import { lineString } from '@turf/helpers'
 import { System } from '@xrengine/engine/src/ecs/classes/System'
 import { AvatarComponent } from '@xrengine/engine/src/avatar/components/AvatarComponent'
 import { NavMeshComponent } from '@xrengine/engine/src/navigation/component/NavMeshComponent'
-import { MapAction, mapReducer } from '../src/MapReceptor'
-import { MapStateUnwrapped } from '../src/types'
-import { MapComponent } from '../src/MapComponent'
-import FeatureKey from '../src/classes/FeatureKey'
+import { MapAction, mapReducer } from '../engine/MapReceptor'
+import { MapStateUnwrapped } from '../engine/types'
+import { MapComponent } from '../engine/MapComponent'
+import FeatureKey from '../engine/classes/FeatureKey'
 
 describe.skip('MapUpdateSystem', () => {
   const triggerRefreshRadius = 20 // meters
@@ -33,13 +33,13 @@ describe.skip('MapUpdateSystem', () => {
     createSUT: (world: World) => Promise<System>
 
   beforeEach(async () => {
-    mock('../src/functions/PhaseFunctions', {
+    mock('../engine/functions/PhaseFunctions', {
       getPhases: sinon.spy(),
       startPhases: sinon.spy(),
       resetPhases: sinon.spy()
     })
     mock(
-      '../src/functions/createFeatureLabel',
+      '../engine/functions/createFeatureLabel',
       (() => {
         const { Object3D } = require('three')
         const mesh = new Object3D()
@@ -53,12 +53,12 @@ describe.skip('MapUpdateSystem', () => {
         }
       })()
     )
-    createSUT = require('../src/MapUpdateSystem').default
-    const PhaseFunctions = require('../src/functions/PhaseFunctions')
+    createSUT = require('../engine/MapUpdateSystem').default
+    const PhaseFunctions = require('../engine/functions/PhaseFunctions')
     getPhases = PhaseFunctions.getPhases
     startPhases = PhaseFunctions.startPhases
     resetPhases = PhaseFunctions.resetPhases
-    createFeatureLabel = require('../src/functions/createFeatureLabel')
+    createFeatureLabel = require('../engine/functions/createFeatureLabel')
     world = createWorld()
     viewerEntity = createEntity(world)
     mapEntity = createEntity(world)

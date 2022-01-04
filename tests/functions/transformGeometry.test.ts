@@ -1,5 +1,5 @@
 import assert from 'assert'
-import transformPolygon from '../../src/functions/transformGeometry'
+import transformPolygon from '../../engine/functions/transformGeometry'
 
 describe('transformGeometry', () => {
   it('works', () => {

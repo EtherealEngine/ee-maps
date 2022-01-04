@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { longToTileXFraction, latToTileYFraction, tileXToLong, tileYToLat } from '../../src/functions/UnitConversionFunctions'
+import { longToTileXFraction, latToTileYFraction, tileXToLong, tileYToLat } from '../../engine/functions/UnitConversionFunctions'
 
 const LATITUDE_ABS_MAX = 85.0511
 

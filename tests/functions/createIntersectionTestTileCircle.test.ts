@@ -1,5 +1,5 @@
 import assert from 'assert'
-import createIntersectTestTileCircle from '../../src/functions/createIntersectionTestTileCircle'
+import createIntersectTestTileCircle from '../../engine/functions/createIntersectionTestTileCircle'
 
 describe('createIntersectTestTileCircle', () => {
   it('works', () => {

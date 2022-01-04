@@ -2,7 +2,7 @@ import assert from 'assert'
 import sinon, {SinonSpy} from 'sinon'
 import { Geometry, Position } from 'geojson'
 import * as YUKA from 'yuka'
-import { NavMeshBuilder } from '../src/NavMeshBuilder'
+import { NavMeshBuilder } from '../engine/NavMeshBuilder'
 
 function mockCallArg(fn: Function, callIdx: number, argIdx: number): any {
   return (fn as SinonSpy).getCall(callIdx).args[argIdx]

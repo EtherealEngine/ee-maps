@@ -1,7 +1,7 @@
 import assert from 'assert'
-import ParametricCache from '../../src/classes/ParametricCache'
-import TileKey from '../../src/classes/TileKey'
-import createUsingCache from '../../src/functions/createUsingCache'
+import ParametricCache from '../../engine/classes/ParametricCache'
+import TileKey from '../../engine/classes/TileKey'
+import createUsingCache from '../../engine/functions/createUsingCache'
 
 describe('createUsingCache', () => {
   it('works', () => {

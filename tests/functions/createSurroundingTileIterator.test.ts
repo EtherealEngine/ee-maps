@@ -1,6 +1,6 @@
-import createSurroundingTileIterator from '../../src/functions/createSurroundingTileIterator';
+import createSurroundingTileIterator from '../../engine/functions/createSurroundingTileIterator';
 import assert from 'assert'
-import TileKey from '../../src/classes/TileKey';
+import TileKey from '../../engine/classes/TileKey';
 
 // TODO start with center tiles and work outward
 const testCaseSanFrancisco = {

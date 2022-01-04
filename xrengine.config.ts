@@ -3,6 +3,7 @@ import type { ProjectConfigInterface } from '@xrengine/projects/ProjectConfigInt
 const config: ProjectConfigInterface = {
   onEvent: undefined,
   thumbnail: '/static/xrengine_thumbnail.jpg',
+  registerWorld: () => import('./registerWorld'),
   routes: {},
   services: undefined,
   databaseSeed: undefined

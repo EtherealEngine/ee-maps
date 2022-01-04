@@ -1,83 +1,55 @@
-import i18n from 'i18next'
 import React from 'react'
-import MapIcon from '@mui/icons-material/Map'
 import { useTranslation } from 'react-i18next'
 import { CommandManager } from '@xrengine/editor/src/managers/CommandManager'
 import BooleanInput from '@xrengine/editor/src/components/inputs/BooleanInput'
 import InputGroup from '@xrengine/editor/src/components/inputs/InputGroup'
 import StringInput from '@xrengine/editor/src/components/inputs/StringInput'
 import NodeEditor from '@xrengine/editor/src/components/properties/NodeEditor'
+import { MapComponent } from '../engine/MapComponent'
+import { EditorComponentType } from '@xrengine/editor/src/components/properties/Util'
+import { getComponent } from '@xrengine/engine/src/ecs/functions/ComponentFunctions'
 
-type MapNodeEditorProps = {
-  node?: any
-}
-
-/**
- * [BoxColliderNodeEditor is used to provide properties to customize box collider element]
- * @type {[component class]}
- */
-
-export function MapNodeEditor(props: MapNodeEditorProps) {
-  const { node } = props
+export const MapNodeEditor: EditorComponentType = (props) => {
   const { t } = useTranslation()
 
-  const onChangeStartLatitude = (payload) => {
-    CommandManager.instance.setPropertyOnSelection('startLatitude', payload)
+  const onChangeValue = (prop) => (value) => {
+    CommandManager.instance.setPropertyOnSelectionEntities({
+      component: MapComponent,
+      properties: { [prop]: value }
+    })
   }
 
-  const onChangeStartLongitude = (payload) => {
-    CommandManager.instance.setPropertyOnSelection('startLongitude', payload)
-  }
-
-  const onChangeUseGeolocation = (payload) => {
-    CommandManager.instance.setPropertyOnSelection('useDeviceGeolocation', payload)
-  }
-
-  const onChangeShowRasterTiles = (payload) => {
-    CommandManager.instance.setPropertyOnSelection('showRasterTiles', payload)
-  }
-
-  const onToggleDebug = (payload) => {
-    CommandManager.instance.setPropertyOnSelection('enableDebug', payload)
-  }
-
-  //defining description and shows this description in NodeEditor  with title of elementt,
-  // available to add in scene in assets.
-  const description = i18n.t('editor:properties.map.description')
+  const mapComponent = getComponent(props.node.entity, MapComponent)
 
   return (
-    <NodeEditor {...props} description={description}>
+    <NodeEditor {...props} description={t('editor:properties.map.description')}>
       <InputGroup
         name="Start at device's geolocation?"
         label={t('editor:properties.map.lbl-useDeviceGeolocation')}
         info={t('editor:properties.map.info-useDeviceGeolocation')}
       >
-        <BooleanInput value={node.useDeviceGeolocation} onChange={onChangeUseGeolocation} />
+        <BooleanInput value={mapComponent.useDeviceGeolocation} onChange={onChangeValue('useDeviceGeolocation')} />
       </InputGroup>
       <InputGroup name="Start Latitude" label={t('editor:properties.map.lbl-startLatitude')}>
-        <StringInput value={node.startLatitude} onChange={onChangeStartLatitude} />
+        <StringInput value={mapComponent.startLatitude} onChange={onChangeValue('startLatitude')} />
       </InputGroup>
       <InputGroup name="Start Longitude" label={t('editor:properties.map.lbl-startLongitude')}>
-        <StringInput value={node.startLongitude} onChange={onChangeStartLongitude} />
+        <StringInput value={mapComponent.startLongitude} onChange={onChangeValue('startLongitude')} />
       </InputGroup>
       <InputGroup
         name="Show Raster Tiles?"
         label={t('editor:properties.map.lbl-showRasterTiles')}
         info={t('editor:properties.map.info-showRasterTiles')}
       >
-        <BooleanInput value={node.showRasterTiles} onChange={onChangeShowRasterTiles} />
+        <BooleanInput value={mapComponent.showRasterTiles} onChange={onChangeValue('showRasterTiles')} />
       </InputGroup>
       <InputGroup
         name="Enable debugging code?"
         label={t('editor:properties.map.lbl-enableDebug')}
         info={t('editor:properties.map.info-enableDebug')}
       >
-        <BooleanInput value={node.enableDebug} onChange={onToggleDebug} />
+        <BooleanInput value={mapComponent.enableDebug} onChange={onChangeValue('enableDebug')} />
       </InputGroup>
     </NodeEditor>
   )
 }
-
-MapNodeEditor.iconComponent = MapIcon
-
-export default MapNodeEditor

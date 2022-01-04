@@ -1,4 +1,4 @@
-import computeSquared from '../../../src/map/functions/computeSquaredDistanceFromCircle'
+import computeSquared from './computeSquaredDistanceFromCircle'
 
 export default function isIntersectCircleCircle(
   centerPointA: [number, number],

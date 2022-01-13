@@ -12,7 +12,7 @@ export default async function fetchVectorTile(_: any, key: TileKey): Promise<Vec
     y,
     TILE_ZOOM,
     'vector.pbf',
-    process.env['MAPBOX_API_KEY']!
+    globalThis.MAPBOX_API_KEY // TODO: hook this up to map state
   )
   const response = await fetch(url)
   const blob = await response.blob()

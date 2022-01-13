@@ -2,6 +2,7 @@ import { createMappedComponent } from '@xrengine/engine/src/ecs/functions/Compon
 import { Vector3 } from 'three'
 
 export type MapComponentType = {
+  apiKey: string
   name?: string
   scale?: Vector3
   style?: any

@@ -1,6 +1,6 @@
 import { getStartCoords } from './getStartCoords'
 import { MapComponentType } from './MapComponent'
-import { addComponent, getComponent } from '@xrengine/engine/src/ecs/functions/ComponentFunctions'
+import { addComponent, getComponent, hasComponent } from '@xrengine/engine/src/ecs/functions/ComponentFunctions'
 import { DebugNavMeshComponent } from '@xrengine/engine/src/debug/DebugNavMeshComponent'
 import { Entity } from '@xrengine/engine/src/ecs/classes/Entity'
 import { Object3D, Group, Mesh } from 'three'
@@ -31,15 +31,14 @@ export const deserializeMap = (entity: Entity, json: ComponentJson<MapComponentT
 }
 
 export const createMap = async (entity: Entity, args: MapComponentType) => {
-
-  if(Engine.isEditor) {
+  if(Engine.isEditor && hasComponent(entity, MapComponent)) {
     _updateMap(entity, args)
     return
   }
   // TODO: handle "navigator.geolocation.getCurrentPosition" rejection?
-  const center = await getStartCoords(args)
 
   addComponent(entity, MapComponent, args)
+  const center = await getStartCoords(args)
 
   const mapObject3D = new Group()
   const navigationRaycastTarget = new Group()
@@ -133,6 +132,7 @@ export const serializeMap = (entity: Entity) => {
   return {
     name: SCENE_COMPONENT_MAP,
     props: {
+      apiKey: mapComponent.apiKey,
       name: mapComponent.name,
       scale: mapComponent.scale,
       useTimeOfDay: mapComponent.useTimeOfDay,

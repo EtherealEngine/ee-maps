@@ -14,6 +14,7 @@
     "module": "CommonJS",
     "strict": false,
     "strictNullChecks": true,
+    "strictBindCallApply": true,
     "noImplicitAny": false,
     "resolveJsonModule": true,
     "esModuleInterop": true,
@@ -25,13 +26,15 @@
     "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
     "declaration": true,
-    "outDir": "./lib"
+    "outDir": "./lib",
+    "types": ["vite/client", "mocha"]
   },
   "exclude": [
     "**/node_modules/**",
     "./tests/**/*.ts"
   ],
   "include": [
+    "../../../server-core/src/*",
     "./**/*.ts",
     "./**/*.tsx"
   ]

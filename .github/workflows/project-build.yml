@@ -18,10 +18,10 @@ jobs:
     if: ${{ needs.secrets-gate.outputs.ok == 'enabled' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout XREngine
+      - name: Checkout Etheral Engine
         uses: actions/checkout@v2
         with:
-          repository: xrfoundation/xrengine
+          repository: etherealengine/etherealengine
       - name: Checkout Project
         uses: actions/checkout@v2
         with:

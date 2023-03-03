@@ -1,6 +1,6 @@
 import { TaskStatus } from '../types'
 import { ICachingPhase, IPhase, ISyncPhase, MapStateUnwrapped } from '../types'
-import { isClient } from '@xrengine/engine/src/common/functions/isClient'
+import { isClient } from '@etherealengine/engine/src/common/functions/isClient'
 
 // Random Thought: Monads like https://github.com/monet/monet.js/blob/master/docs/FREE.md could be useful here.
 type FeatureId = 'navigation'

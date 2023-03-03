@@ -1,6 +1,6 @@
 import { Feature } from 'geojson'
-import updateKeyVal from '@xrengine/engine/src/common/functions/updateKeyVal'
-import zipIterators from '@xrengine/engine/src/common/functions/zipIterators'
+import updateKeyVal from '@etherealengine/engine/src/common/functions/updateKeyVal'
+import zipIterators from '@etherealengine/engine/src/common/functions/zipIterators'
 import { FeatureKey } from '../types'
 
 type GroupKey = Feature['id']

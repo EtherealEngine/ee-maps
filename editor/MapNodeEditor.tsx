@@ -1,12 +1,12 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import BooleanInput from '@xrengine/editor/src/components/inputs/BooleanInput'
-import InputGroup from '@xrengine/editor/src/components/inputs/InputGroup'
-import StringInput from '@xrengine/editor/src/components/inputs/StringInput'
-import NodeEditor from '@xrengine/editor/src/components/properties/NodeEditor'
+import BooleanInput from '@etherealengine/editor/src/components/inputs/BooleanInput'
+import InputGroup from '@etherealengine/editor/src/components/inputs/InputGroup'
+import StringInput from '@etherealengine/editor/src/components/inputs/StringInput'
+import NodeEditor from '@etherealengine/editor/src/components/properties/NodeEditor'
 import { MapComponent } from '../engine/MapComponent'
-import { EditorComponentType, updateProperty } from '@xrengine/editor/src/components/properties/Util'
-import { getComponent } from '@xrengine/engine/src/ecs/functions/ComponentFunctions'
+import { EditorComponentType, updateProperty } from '@etherealengine/editor/src/components/properties/Util'
+import { getComponent } from '@etherealengine/engine/src/ecs/functions/ComponentFunctions'
 
 export const MapNodeEditor: EditorComponentType = (props) => {
   const { t } = useTranslation()

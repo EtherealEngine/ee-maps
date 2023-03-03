@@ -20,7 +20,7 @@ import { MultiPolygon } from 'polygon-clipping'
 import MutableNavMesh from './classes/MutableNavMesh'
 import { LongLat } from './functions/UnitConversionFunctions'
 import HashSet from './classes/HashSet'
-import { isClient } from '@xrengine/engine/src/common/functions/isClient'
+import { isClient } from '@etherealengine/engine/src/common/functions/isClient'
 import { Mesh } from 'three'
 
 const state = createState({

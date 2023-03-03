@@ -1,8 +1,8 @@
 
-import { World } from '@xrengine/engine/src/ecs/classes/World'
+import { World } from '@etherealengine/engine/src/ecs/classes/World'
 import { deserializeMap, SCENE_COMPONENT_MAP, SCENE_COMPONENT_MAP_DEFAULT_VALUES, serializeMap, updateMap } from './engine/MapFunctions'
-import { defaultSpatialComponents } from '@xrengine/engine/src/scene/functions/registerPrefabs'
-import { isNode } from '@xrengine/engine/src/common/functions/getEnvironment'
+import { defaultSpatialComponents } from '@etherealengine/engine/src/scene/functions/registerPrefabs'
+import { isNode } from '@etherealengine/engine/src/common/functions/getEnvironment'
 
 export const map = 'Geo Map' as const
 

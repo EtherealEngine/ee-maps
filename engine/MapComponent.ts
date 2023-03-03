@@ -1,4 +1,4 @@
-import { createMappedComponent } from '@xrengine/engine/src/ecs/functions/ComponentFunctions'
+import { createMappedComponent } from '@etherealengine/engine/src/ecs/functions/ComponentFunctions'
 import { Vector3 } from 'three'
 
 export type MapComponentType = {

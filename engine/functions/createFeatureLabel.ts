@@ -2,9 +2,9 @@ import { MapFeatureLabel, Text3D } from '../types'
 import { Text } from 'troika-three-text'
 import { Feature, LineString, Position } from 'geojson'
 import * as turf from '@turf/turf'
-import { Engine } from '@xrengine/engine/src/ecs/classes/Engine'
+import { Engine } from '@etherealengine/engine/src/ecs/classes/Engine'
 import { Vector3 } from 'three'
-import { LongLat, toMetersFromCenter } from '../functions/UnitConversionFunctions'
+import { LongLat, toMetersFromCenter } from './UnitConversionFunctions'
 
 const MINIMUM_FONT_SIZE = 6
 const MAXIMUM_FONT_SIZE = 10

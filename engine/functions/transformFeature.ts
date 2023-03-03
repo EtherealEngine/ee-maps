@@ -1,5 +1,5 @@
 import { ILayerName, MapTransformedFeature, SupportedFeature } from '../types'
-import { LongLat, toMetersFromCenter } from '../functions/UnitConversionFunctions'
+import { LongLat, toMetersFromCenter } from './UnitConversionFunctions'
 import transformGeometry from './transformGeometry'
 import * as turf from '@turf/turf'
 import { DEFAULT_FEATURE_STYLES, getFeatureStyles } from '../styles'

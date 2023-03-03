@@ -1,8 +1,11 @@
 {
-  "name": "XREngine-Project-Maps",
+  "name": "ee-maps",
   "version": "0.0.0",
   "description": "",
   "main": "",
+  "etherealEngine": {
+    "version": "0.0.0"
+  },
   "scripts": {
     "test": "exit 0"
   },

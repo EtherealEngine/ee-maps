@@ -4,7 +4,7 @@ import {
   LongLat,
   latToTileYFraction,
   longToTileXFraction
-} from '../functions/UnitConversionFunctions'
+} from './UnitConversionFunctions'
 import TileKey from '../classes/TileKey'
 
 export default function* createSurroundingTileIterator(

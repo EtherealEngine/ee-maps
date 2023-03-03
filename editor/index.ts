@@ -1,9 +1,9 @@
 
-import { EntityNodeEditor, prefabIcons } from '@xrengine/editor/src/functions/PrefabEditors'
+import { EntityNodeEditor, prefabIcons } from '@etherealengine/editor/src/functions/PrefabEditors'
 import { MapNodeEditor } from './MapNodeEditor'
 import MapIcon from '@mui/icons-material/Map'
 import { map } from '../worldInjection'
-import { World } from '@xrengine/engine/src/ecs/classes/World'
+import { World } from '@etherealengine/engine/src/ecs/classes/World'
 import MapUpdateSystem from '../engine/MapUpdateSystem'
 
 EntityNodeEditor[map] = MapNodeEditor

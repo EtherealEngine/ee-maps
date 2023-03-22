@@ -167,7 +167,7 @@ The [map update system](/packages/engine/src/map/MapUpdateSystem.ts) is triggere
 
 # Summarised Diagram :-
 
-![picture alt](../ee-maps/ee-diagram.jpg)
+![picture alt](./ee-diagram.jpg)
 
 Requires Mapbox API configuration to function
 

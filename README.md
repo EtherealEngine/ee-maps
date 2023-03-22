@@ -123,7 +123,7 @@ _createSurroundingTileIterator_ which iterates over each key ( or tile info ) an
 
 - _createWorkerFunction:-_ This function uses comlink that links the workers folder and it’s api to this function and makes use of worker functions:-
 
-- _WORKERS😘
+- _WORKERS_
   _ _GeometryWorker.ts :-_ Uses the createGeometry function (more context needed)
 
       * _transformFeatureWorker.ts :-_ Runs the transformFeature.ts file’s transformFeature function which in turn uses the tranformGeometry function which uses geojson to return linestring, multilinestring and multipolygon geometry to a geojson format .

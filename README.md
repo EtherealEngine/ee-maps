@@ -124,7 +124,7 @@ _createSurroundingTileIterator_ which iterates over each key ( or tile info ) an
 - _createWorkerFunction:-_ This function uses comlink that links the workers folder and it’s api to this function and makes use of worker functions:-
 
 - _WORKERS_
-  _ _GeometryWorker.ts :-_ Uses the createGeometry function (more context needed)
+  \_ _GeometryWorker.ts :-_ Uses the createGeometry function (more context needed)
 
       * _transformFeatureWorker.ts :-_ Runs the transformFeature.ts file’s transformFeature function which in turn uses the tranformGeometry function which uses geojson to return linestring, multilinestring and multipolygon geometry to a geojson format .
 
@@ -167,7 +167,7 @@ The [map update system](/packages/engine/src/map/MapUpdateSystem.ts) is triggere
 
 # Summarised Diagram :-
 
-![picture alt](https://docs.google.com/document/d/14iiWhWq-OG6Yu5mfGcXuascd1cNrqZ9yE7RAUzf1vMI/edit?usp=share_link)
+![picture alt](../ee-maps/ee-diagram.jpg)
 
 Requires Mapbox API configuration to function
 

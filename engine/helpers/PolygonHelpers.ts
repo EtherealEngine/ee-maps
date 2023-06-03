@@ -6,7 +6,7 @@ import {
   MeshBasicMaterial,
   Mesh,
   Shape,
-  ShapeBufferGeometry,
+  ShapeGeometry,
   Path
 } from 'three'
 
@@ -34,7 +34,7 @@ export function createPolygonHelper(polygon: Polygon): Mesh {
     shape.holes[innerRingIndex - 1] = path
   }
 
-  const geometry = new ShapeBufferGeometry(shape)
+  const geometry = new ShapeGeometry(shape)
   const material = new MeshBasicMaterial({ color })
 
   geometry.rotateX(-Math.PI / 2)

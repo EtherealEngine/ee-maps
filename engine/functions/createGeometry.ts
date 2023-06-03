@@ -22,13 +22,13 @@ function getBuildingColor(feature: SupportedFeature) {
 }
 
 function colorVertices(geometry: BufferGeometry, baseColor: Color, light: Color, shadow: Color) {
-  const normals = geometry.attributes.normal
+  const normals = geometry.attributes.normal as BufferAttribute
   const topColor = baseColor.clone().multiply(light)
   const bottomColor = baseColor.clone().multiply(shadow)
 
   geometry.setAttribute('color', new BufferAttribute(new Float32Array(normals.count * 3), 3))
 
-  const colors = geometry.attributes.color
+  const colors = geometry.attributes.color as BufferAttribute
 
   geometry.computeVertexNormals()
   geometry.computeBoundingBox()

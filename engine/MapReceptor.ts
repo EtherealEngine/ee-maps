@@ -20,7 +20,7 @@ import { MultiPolygon } from 'polygon-clipping'
 import MutableNavMesh from './classes/MutableNavMesh'
 import { LongLat } from './functions/UnitConversionFunctions'
 import HashSet from './classes/HashSet'
-import { isClient } from '@etherealengine/engine/src/common/functions/isClient'
+import { isClient } from '@etherealengine/engine/src/common/functions/getEnvironment'
 import { Mesh } from 'three'
 
 const state = createState({
@@ -86,25 +86,22 @@ export const mapReducer = (_, action: MapActionType) => {
 }
 
 export const mapReceptor = (action: MapActionType) => {
-  state.batch((s) => {
-    switch (action.type) {
-      case 'map.INITIALIZE':
-        return s.merge({
-          center: action.centerPoint,
+  switch(action.type) {
+    case 'map.INITIALIZE': return state.merge({
+      center: action.centerPoint,
           originalCenter: action.centerPoint,
           triggerRefreshRadius: action.triggerRefreshRadius,
           minimumSceneRadius: action.minimumSceneRadius,
           labelRadius: action.minimumSceneRadius * 0.5,
           navMeshRadius: action.minimumSceneRadius * 0.5,
           scale: action.scale
-        })
-      case 'map.SET_CENTER_POINT':
-        return s.merge({
-          center: action.centerPoint,
-          originalCenter: action.centerPoint
-        })
-    }
-  })
+    })
+    case 'map.SET_CENTER_POINT':
+      return state.merge({
+        center: action.centerPoint,
+        originalCenter: action.centerPoint
+      })
+  }
 }
 
 export const accessMapState = () => state

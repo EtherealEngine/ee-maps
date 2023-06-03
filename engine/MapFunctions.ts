@@ -1,38 +1,43 @@
-import { getStartCoords } from './getStartCoords'
-import { MapComponentType } from './MapComponent'
-import { addComponent, getComponent, hasComponent } from '@etherealengine/engine/src/ecs/functions/ComponentFunctions'
-import { DebugNavMeshComponent } from '@etherealengine/engine/src/debug/DebugNavMeshComponent'
-import { Entity } from '@etherealengine/engine/src/ecs/classes/Entity'
-import { Object3D, Group, Mesh } from 'three'
-import { Engine } from '@etherealengine/engine/src/ecs/classes/Engine'
-import { NavMeshComponent } from '@etherealengine/engine/src/navigation/component/NavMeshComponent'
-import { MapAction, mapReducer } from './MapReceptor'
-import { MapComponent } from './MapComponent'
-import { getPhases, startPhases } from './functions/PhaseFunctions'
-import { LoadGLTF } from '@etherealengine/engine/src/assets/functions/LoadGLTF'
-import { avatarHalfHeight } from '@etherealengine/engine/src/avatar/functions/createAvatar'
-import { Text } from 'troika-three-text'
-import { Object3DComponent } from '@etherealengine/engine/src/scene/components/Object3DComponent'
 import { ComponentJson } from '@etherealengine/common/src/interfaces/SceneInterface'
-import { isClient } from '@etherealengine/engine/src/common/functions/isClient'
+import { LoadGLTF } from '@etherealengine/engine/src/assets/functions/LoadGLTF'
+import { defaultAvatarHalfHeight } from '@etherealengine/engine/src/avatar/functions/spawnAvatarReceptor'
+import { DebugNavMeshComponent } from '@etherealengine/engine/src/debug/DebugNavMeshComponent'
+import { Engine } from '@etherealengine/engine/src/ecs/classes/Engine'
+import { EngineState } from '@etherealengine/engine/src/ecs/classes/EngineState'
+import { Entity } from '@etherealengine/engine/src/ecs/classes/Entity'
+import { addComponent, getAllComponents, getComponent, hasComponent } from '@etherealengine/engine/src/ecs/functions/ComponentFunctions'
+import { NavMeshComponent } from '@etherealengine/engine/src/navigation/component/NavMeshComponent'
+import { Object3DComponent } from '@etherealengine/engine/src/scene/components/Object3DComponent'
 import { registerSceneLoadPromise } from '@etherealengine/engine/src/scene/functions/SceneLoading'
-import { EntityNodeComponent } from '@etherealengine/engine/src/scene/components/EntityNodeComponent'
-import { addChildFast, setPosition } from './util'
+import { getState } from '@etherealengine/hyperflux'
+
 import { debounce } from 'lodash'
+import { Group, Mesh, Object3D } from 'three'
+import { Text } from 'troika-three-text'
+
+import { isClient } from '@etherealengine/engine/src/common/functions/getEnvironment'
+import { MapComponent, MapComponentType } from './MapComponent'
+import { MapAction, mapReducer } from './MapReceptor'
+import { getPhases, startPhases } from './functions/PhaseFunctions'
+import { getStartCoords } from './getStartCoords'
+import { addChildFast, setPosition } from './util'
 
 export const SCENE_COMPONENT_MAP = 'map'
 export const SCENE_COMPONENT_MAP_DEFAULT_VALUES = {}
 
 export const deserializeMap = (entity: Entity, json: ComponentJson<MapComponentType>) => {
   if (isClient) {
-    registerSceneLoadPromise(createMap(entity, json.props))
-    if (Engine.isEditor) getComponent(entity, EntityNodeComponent)?.components.push(SCENE_COMPONENT_MAP)
+    registerSceneLoadPromise(createMap(entity, json.props as MapComponentType))
+    if (getState(EngineState).isEditor) {
+      const components = getAllComponents(entity)
+      components.push(SCENE_COMPONENT_MAP)
+    }
   }
 }
 
 export const createMap = async (entity: Entity, args: MapComponentType) => {
-  if(Engine.isEditor && hasComponent(entity, MapComponent)) {
-    _updateMap(entity, args)
+  if(getState(EngineState).isEditor && hasComponent(entity, MapComponent)) {
+    _updateMap(entity, args)   
     return
   }
   // TODO: handle "navigator.geolocation.getCurrentPosition" rejection?
@@ -55,9 +60,9 @@ export const createMap = async (entity: Entity, args: MapComponentType) => {
   const state = mapReducer(null, MapAction.initialize(center, args.scale?.x))
 
   // TODO fix hardcoded URL
-  const spinnerGLTF = await LoadGLTF(Engine.publicPath + '/projects/XREngine-Project-Maps/EarthLowPoly.glb')
+  const spinnerGLTF = await LoadGLTF(getState(EngineState).publicPath + '/projects/XREngine-Project-Maps/EarthLowPoly.glb')
   const spinner = spinnerGLTF.scene as Mesh
-  spinner.position.y = avatarHalfHeight * 2
+  spinner.position.y = defaultAvatarHalfHeight * 2
   spinner.position.z = -150
   state.updateSpinner = spinner
 
@@ -81,7 +86,7 @@ export const createMap = async (entity: Entity, args: MapComponentType) => {
   await startPhases(state, await getPhases({ exclude: ['navigation'] }))
 
   navigationRaycastTarget.scale.setScalar(state.scale)
-  Engine.scene.add(navigationRaycastTarget)
+  Engine.instance.scene.add(navigationRaycastTarget)
 
   addComponent(entity, NavMeshComponent, {
     /*

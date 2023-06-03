@@ -10,8 +10,7 @@ import { getComponent } from '@etherealengine/engine/src/ecs/functions/Component
 
 export const MapNodeEditor: EditorComponentType = (props) => {
   const { t } = useTranslation()
-
-  const mapComponent = getComponent(props.node.entity, MapComponent)
+  const mapComponent = getComponent(props.entity, MapComponent)
   console.log('MapNodeEditor')
 
   return (
@@ -25,7 +24,7 @@ export const MapNodeEditor: EditorComponentType = (props) => {
         label={t('editor:properties.map.lbl-useDeviceGeolocation')}
         info={t('editor:properties.map.info-useDeviceGeolocation')}
       >
-        <BooleanInput value={mapComponent.useDeviceGeolocation} onChange={updateProperty(MapComponent, 'useDeviceGeolocation')} />
+        <BooleanInput value={mapComponent.useDeviceGeolocation as boolean} onChange={updateProperty(MapComponent, 'useDeviceGeolocation')} />
       </InputGroup>
       <InputGroup name="Start Latitude" label={t('editor:properties.map.lbl-startLatitude')}>
         <StringInput value={mapComponent.startLatitude} onChange={updateProperty(MapComponent, 'startLatitude')} />
@@ -38,14 +37,14 @@ export const MapNodeEditor: EditorComponentType = (props) => {
         label={t('editor:properties.map.lbl-showRasterTiles')}
         info={t('editor:properties.map.info-showRasterTiles')}
       >
-        <BooleanInput value={mapComponent.showRasterTiles} onChange={updateProperty(MapComponent, 'showRasterTiles')} />
+        <BooleanInput value={mapComponent.showRasterTiles as boolean} onChange={updateProperty(MapComponent, 'showRasterTiles')} />
       </InputGroup>
       <InputGroup
         name="Enable debugging code?"
         label={t('editor:properties.map.lbl-enableDebug')}
         info={t('editor:properties.map.info-enableDebug')}
       >
-        <BooleanInput value={mapComponent.enableDebug} onChange={updateProperty(MapComponent, 'enableDebug')} />
+        <BooleanInput value={mapComponent.enableDebug as boolean} onChange={updateProperty(MapComponent, 'enableDebug')} />
       </InputGroup>
     </NodeEditor>
   )

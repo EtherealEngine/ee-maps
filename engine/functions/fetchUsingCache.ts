@@ -3,7 +3,7 @@ import { ITuple, MapStateUnwrapped } from '../types'
 import createUsingGetSet from './createUsingGetSet'
 
 export default function fetchUsingCache<CacheKey extends ITuple, Value>(
-  fetch: (state: MapStateUnwrapped, key: CacheKey, ...args: any[]) => Promise<Value>
+  fetch: (state: MapStateUnwrapped, key: CacheKey, ...args: any[]) => Value
 ) {
   const _fetchUsingCache = createUsingGetSet(fetch)
   return async (
@@ -14,7 +14,7 @@ export default function fetchUsingCache<CacheKey extends ITuple, Value>(
   ) => {
     return await _fetchUsingCache(
       cache.get.bind(cache),
-      async function set(key: CacheKey, value: Promise<Value>) {
+      async function set(key: CacheKey, value: Value) {
         const resolvedValue = await value
         cache.set(key, resolvedValue)
       },

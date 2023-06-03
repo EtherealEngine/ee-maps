@@ -4,7 +4,7 @@ import isIntersectCircleCircle from '../functions/isIntersectCircleCircle'
 import { FeatureKey, TaskStatus, MapStateUnwrapped } from '../types'
 import { multiplyArray } from '../util'
 // @ts-ignore
-import createGeometryWorker from '../workers/geometryWorker.ts?worker'
+import createGeometryWorker from '../workers/geometryWorker.ts'
 import { WorkerApi } from '../workers/geometryWorker'
 import { DEFAULT_FEATURE_STYLES, getFeatureStyles } from '../styles'
 import { BufferGeometryLoader } from 'three'
@@ -12,7 +12,7 @@ import { getHumanFriendlyFeatureKey } from '../helpers/KeyHelpers'
 
 const $array2 = Array(2)
 
-const createGeometry = createWorkerFunction<WorkerApi>(createGeometryWorker())
+const createGeometry = createWorkerFunction<WorkerApi>(createGeometryWorker)
 
 const geometryLoader = new BufferGeometryLoader()
 
@@ -63,7 +63,7 @@ export function setTaskStatus(state: MapStateUnwrapped, key: FeatureKey, status:
 }
 
 export function startTask(state: MapStateUnwrapped, key: FeatureKey) {
-  return createGeometryUsingCache(state.geometryCache, state, key)
+  return createGeometryUsingCache(state.geometryCache as any, state, key)
 }
 
 export function cleanup(state: MapStateUnwrapped) {

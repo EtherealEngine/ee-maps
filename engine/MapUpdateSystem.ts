@@ -1,4 +1,3 @@
-import { System } from '@etherealengine/engine/src/ecs/classes/System'
 import { MapComponent } from './MapComponent'
 import { TransformComponent } from '@etherealengine/engine/src/transform/components/TransformComponent'
 import { fromMetersFromCenter, LongLat } from './functions/UnitConversionFunctions'
@@ -7,7 +6,6 @@ import { Vector3 } from 'three'
 import { Entity } from '@etherealengine/engine/src/ecs/classes/Entity'
 import { Object3DComponent } from '@etherealengine/engine/src/scene/components/Object3DComponent'
 import { getComponent, defineQuery, addComponent } from '@etherealengine/engine/src/ecs/functions/ComponentFunctions'
-import { World } from '@etherealengine/engine/src/ecs/classes/World'
 import isIntersectCircleCircle from './functions/isIntersectCircleCircle'
 import { AvatarComponent } from '@etherealengine/engine/src/avatar/components/AvatarComponent'
 import { NavMeshComponent } from '@etherealengine/engine/src/navigation/component/NavMeshComponent'
@@ -15,6 +13,7 @@ import { accessMapState } from './MapReceptor'
 import { Downgraded } from '@hookstate/core'
 import { getPhases, startPhases, resetPhases } from './functions/PhaseFunctions'
 import { TargetCameraRotationComponent } from '@etherealengine/engine/src/camera/components/TargetCameraRotationComponent'
+import { Engine } from '@etherealengine/engine/src/ecs/classes/Engine'
 
 const PI2 = Math.PI * 2
 const $vector3 = new Vector3()
@@ -24,7 +23,7 @@ const $normalScaleViewerPositionDelta = new Array(2) as [number, number]
 const $previousViewerPosition = new Vector3()
 const $previousMapCenterPoint: LongLat = Array(2)
 
-export default async function MapUpdateSystem(world: World): Promise<System> {
+export default async function MapUpdateSystem(): Promise<any> {
   const mapsQuery = defineQuery([MapComponent])
   const viewerQuery = defineQuery([AvatarComponent])
   const navMeshQuery = defineQuery([NavMeshComponent])
@@ -33,12 +32,12 @@ export default async function MapUpdateSystem(world: World): Promise<System> {
   let spinnerAngle = 0
 
   return () => {
-    const viewerEntity = viewerQuery(world)[0]
-    const mapEntities = mapsQuery(world)
+    const viewerEntity = viewerQuery()[0]
+    const mapEntities = mapsQuery()
     const mapEntity = mapEntities[0]
-    const navPlaneEntity = navMeshQuery(world)[0]
+    const navPlaneEntity = navMeshQuery()[0]
     // Sanity checks
-    if (!mapEntity || !viewerEntity) return world
+    if (!mapEntity || !viewerEntity) return 
     if (mapEntities.length > 1) console.warn('Not supported: More than one map!')
     const mapState = accessMapState().attach(Downgraded).get()
     const mapScale = mapState.scale
@@ -95,12 +94,12 @@ export default async function MapUpdateSystem(world: World): Promise<System> {
       spinnerAngle = (spinnerAngle + 0.01) % PI2
 
       object3dComponent.value.children.length = 0
-      navigationRaycastTarget.children.length = 0
+      // navigationRaycastTarget.children.length = 0
       object3dComponent.value.children[0] = spinner
 
       object3dComponent.value.children[1] = mapState.updateTextContainer!
 
-      avatar.modelContainer.visible = false
+      avatar.model!.visible = false
       addComponent(viewerEntity, TargetCameraRotationComponent, {
         time: 0,
         phi: 0,
@@ -109,7 +108,7 @@ export default async function MapUpdateSystem(world: World): Promise<System> {
         thetaVelocity: { value: Math.PI }
       })
     } else if (mapState.activePhase === 'UpdateScene') {
-      avatar.modelContainer.visible = true
+      avatar.model!.visible = true
       object3dComponent.value.children.length = 0
       for (const key of mapState.completeObjects.keys()) {
         const object = mapState.completeObjects.get(key)
@@ -147,7 +146,7 @@ export default async function MapUpdateSystem(world: World): Promise<System> {
           }
         }
       }
-      navigationRaycastTarget.children.length = 0
+      // navigationRaycastTarget.children.length = 0
       for (const key of mapState.completeObjects.keys()) {
         const layerName = key[0]
         if (layerName === 'landuse_fallback') {
@@ -168,7 +167,7 @@ export default async function MapUpdateSystem(world: World): Promise<System> {
     }
 
     // Update labels
-    if (Math.round(world.fixedElapsedTime / world.fixedDelta) % 20 === 0) {
+    if (Math.round(Engine.instance.elapsedSeconds / Engine.instance.fixedDeltaSeconds) % 20 === 0) {
       for (const label of mapState.labelCache.values()) {
         if (label.mesh) {
           if (
@@ -185,6 +184,5 @@ export default async function MapUpdateSystem(world: World): Promise<System> {
       }
     }
     previousViewerEntity = viewerEntity
-    return world
   }
 }

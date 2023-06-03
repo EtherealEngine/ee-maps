@@ -37,7 +37,7 @@ function createText(textString: string): Text3D {
 const $cameraDirection = new Vector3()
 function createUpdateClosure(mesh: Text3D, middleSlice: Position[]) {
   return function updateFeatureLabel() {
-    const camera = Engine.camera
+    const camera = Engine.instance.camera
     const [[x1, y1]] = middleSlice
     const [x2, y2] = middleSlice[middleSlice.length - 1]
 
@@ -53,7 +53,7 @@ function createUpdateClosure(mesh: Text3D, middleSlice: Position[]) {
     )
     mesh.rotateX(-Math.PI / 2)
 
-    mesh.fontSize = Math.min(Math.max(Engine.camera.position.y / 4, MINIMUM_FONT_SIZE), MAXIMUM_FONT_SIZE)
+    mesh.fontSize = Math.min(Math.max(Engine.instance.camera.position.y / 4, MINIMUM_FONT_SIZE), MAXIMUM_FONT_SIZE)
 
     mesh.sync()
   }

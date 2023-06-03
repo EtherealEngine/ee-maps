@@ -1,4 +1,5 @@
 import * as Comlink from 'comlink'
+import { BufferAttribute } from 'three'
 import createGeometry from '../functions/createGeometry'
 import { IStyles } from '../styles'
 import { SupportedFeature } from '../types'
@@ -26,7 +27,7 @@ function createGeometryInWorker(feature: SupportedFeature, style: IStyles) {
 
   const attributes = {}
   for (let attributeName of Object.keys(geometry.attributes)) {
-    const attribute = geometry.getAttribute(attributeName)
+    const attribute = geometry.getAttribute(attributeName) as BufferAttribute
     const array = attribute.array as Float32Array
     Comlink.transfer(array, [array.buffer])
     attributes[attributeName] = {

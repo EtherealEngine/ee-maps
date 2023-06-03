@@ -1,11 +1,10 @@
 import { MapStateUnwrapped, FeatureKey, TaskStatus } from '../types'
 import fetchUsingCache from '../functions/fetchUsingCache'
-// @ts-ignore
-import createWorker from '../workers/transformFeatureWorker.ts?worker'
 import { WorkerApi } from '../workers/transformFeatureWorker'
 import createWorkerFunction from '../functions/createWorkerFunction'
+import { createWorkerFromCrossOriginURL } from '@etherealengine/common/src/utils/createWorkerFromCrossOriginURL'
 
-const transformFeature = createWorkerFunction<WorkerApi>(createWorker())
+const transformFeature = createWorkerFunction<WorkerApi>(createWorkerFromCrossOriginURL('../workers/transformFeatureWorker.ts', true, {name: 'Transform Feature Worker'}))
 
 export const name = 'TransformFeature'
 export const isAsyncPhase = true
@@ -34,7 +33,7 @@ export function setTaskStatus(state: MapStateUnwrapped, key: FeatureKey, status:
 }
 
 export function startTask(state: MapStateUnwrapped, key: FeatureKey) {
-  return transformFeatureUsingCache(state.transformedFeatureCache, state, key)
+  return transformFeatureUsingCache(state.transformedFeatureCache as any, state, key)
 }
 
 export function cleanup(state: MapStateUnwrapped) {

@@ -4,7 +4,7 @@ import { WorkerApi } from '../workers/transformFeatureWorker'
 import createWorkerFunction from '../functions/createWorkerFunction'
 import { createWorkerFromCrossOriginURL } from '@etherealengine/common/src/utils/createWorkerFromCrossOriginURL'
 
-const transformFeature = createWorkerFunction<WorkerApi>(createWorkerFromCrossOriginURL('../workers/transformFeatureWorker.ts', true, {name: 'Transform Feature Worker'}))
+const transformFeature = createWorkerFunction<WorkerApi>(createWorkerFromCrossOriginURL(new URL('../workers/transformFeatureWorker.ts', import.meta.url).href, true, {name: 'Transform Feature Worker'}))
 
 export const name = 'TransformFeature'
 export const isAsyncPhase = true

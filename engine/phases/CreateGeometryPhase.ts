@@ -11,7 +11,7 @@ import { createWorkerFromCrossOriginURL } from '@etherealengine/common/src/utils
 
 const $array2 = Array(2)
 
-const createGeometry = createWorkerFunction<WorkerApi>(createWorkerFromCrossOriginURL('../workers/geometryWorker.ts', true, {name: "Geometry Worker"}))
+const createGeometry = createWorkerFunction<WorkerApi>(createWorkerFromCrossOriginURL(new URL('../workers/geometryWorker.ts', import.meta.url).href, true, {name: "Geometry Worker"}))
 
 const geometryLoader = new BufferGeometryLoader()
 

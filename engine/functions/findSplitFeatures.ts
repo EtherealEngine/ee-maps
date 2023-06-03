@@ -12,7 +12,7 @@ export default function* findSplitFeatures(keys: Iterator<FeatureKey>, features:
   const groups = new Map<GroupKey, Group>()
   const addToGroup = updateKeyVal(
     groups.get.bind(groups),
-    groups.set.bind(groups),
+    groups.set.bind(groups), // help needed!
     (group: Group, newKey: FeatureKey, newFeature: Feature) => {
       return [...group, [newKey, newFeature]]
     },

@@ -37,7 +37,7 @@ export const deserializeMap = (entity: Entity, json: ComponentJson<MapComponentT
 
 export const createMap = async (entity: Entity, args: MapComponentType) => {
   if(getState(EngineState).isEditor && hasComponent(entity, MapComponent)) {
-    _updateMap(entity, args)   
+    _updateMap(entity, args)
     return
   }
   // TODO: handle "navigator.geolocation.getCurrentPosition" rejection?

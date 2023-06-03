@@ -94,7 +94,7 @@ export default async function MapUpdateSystem(): Promise<any> {
       spinnerAngle = (spinnerAngle + 0.01) % PI2
 
       object3dComponent.value.children.length = 0
-      // navigationRaycastTarget.children.length = 0
+      navigationRaycastTarget.children.length = 0
       object3dComponent.value.children[0] = spinner
 
       object3dComponent.value.children[1] = mapState.updateTextContainer!

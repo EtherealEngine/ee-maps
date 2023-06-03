@@ -3,16 +3,15 @@ import fetchUsingCache from '../functions/fetchUsingCache'
 import isIntersectCircleCircle from '../functions/isIntersectCircleCircle'
 import { FeatureKey, TaskStatus, MapStateUnwrapped } from '../types'
 import { multiplyArray } from '../util'
-// @ts-ignore
-import createGeometryWorker from '../workers/geometryWorker.ts'
 import { WorkerApi } from '../workers/geometryWorker'
 import { DEFAULT_FEATURE_STYLES, getFeatureStyles } from '../styles'
 import { BufferGeometryLoader } from 'three'
 import { getHumanFriendlyFeatureKey } from '../helpers/KeyHelpers'
+import { createWorkerFromCrossOriginURL } from '@etherealengine/common/src/utils/createWorkerFromCrossOriginURL'
 
 const $array2 = Array(2)
 
-const createGeometry = createWorkerFunction<WorkerApi>(createGeometryWorker)
+const createGeometry = createWorkerFunction<WorkerApi>(createWorkerFromCrossOriginURL('../workers/geometryWorker.ts', true, {name: "Geometry Worker"}))
 
 const geometryLoader = new BufferGeometryLoader()
 

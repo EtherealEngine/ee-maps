@@ -5,7 +5,7 @@ import { TILE_ZOOM } from '../constants'
 import fetchUsingCache from '../functions/fetchUsingCache'
 import fetchVectorTile from '../functions/fetchVectorTile'
 
-const fetchVectorTileUsingCache = fetchUsingCache<TileKey, VectorTile>(fetchVectorTile)
+const fetchVectorTileUsingCache = fetchUsingCache<TileKey, VectorTile>(fetchVectorTile) // help needed!
 
 export const name = 'FetchTiles'
 export const isAsyncPhase = true

@@ -17,34 +17,34 @@ export const MapNodeEditor: EditorComponentType = (props) => {
     <NodeEditor {...props} description={t('editor:properties.map.description')}>
 
       <InputGroup name="Mapbox API Key" label={'Mapbox API Key'}>
-        <StringInput value={mapComponent.value.apiKey} onChange={updateProperty(MapComponent, 'apiKey')} />
+        <StringInput value={mapComponent.apiKey.value} onChange={updateProperty(MapComponent, 'apiKey')} />
       </InputGroup>
       <InputGroup
         name="Start at device's geolocation?"
         label={t('editor:properties.map.lbl-useDeviceGeolocation')}
         info={t('editor:properties.map.info-useDeviceGeolocation')}
       >
-        <BooleanInput value={mapComponent.value.useDeviceGeolocation as boolean} onChange={updateProperty(MapComponent, 'useDeviceGeolocation')} />
+        <BooleanInput value={mapComponent.useDeviceGeolocation.value as boolean} onChange={updateProperty(MapComponent, 'useDeviceGeolocation')} />
       </InputGroup>
       <InputGroup name="Start Latitude" label={t('editor:properties.map.lbl-startLatitude')}>
-        <StringInput value={mapComponent.value.startLatitude} onChange={updateProperty(MapComponent, 'startLatitude')} />
+        <StringInput value={mapComponent.startLatitude.value} onChange={updateProperty(MapComponent, 'startLatitude')} />
       </InputGroup>
       <InputGroup name="Start Longitude" label={t('editor:properties.map.lbl-startLongitude')}>
-        <StringInput value={mapComponent.value.startLongitude} onChange={updateProperty(MapComponent, 'startLongitude')} />
+        <StringInput value={mapComponent.startLongitude.value} onChange={updateProperty(MapComponent, 'startLongitude')} />
       </InputGroup>
       <InputGroup
         name="Show Raster Tiles?"
         label={t('editor:properties.map.lbl-showRasterTiles')}
         info={t('editor:properties.map.info-showRasterTiles')}
       >
-        <BooleanInput value={mapComponent.value.showRasterTiles as boolean} onChange={updateProperty(MapComponent, 'showRasterTiles')} />
+        <BooleanInput value={mapComponent.showRasterTiles.value as boolean} onChange={updateProperty(MapComponent, 'showRasterTiles')} />
       </InputGroup>
       <InputGroup
         name="Enable debugging code?"
         label={t('editor:properties.map.lbl-enableDebug')}
         info={t('editor:properties.map.info-enableDebug')}
       >
-        <BooleanInput value={mapComponent.value.enableDebug as boolean} onChange={updateProperty(MapComponent, 'enableDebug')} />
+        <BooleanInput value={mapComponent.enableDebug.value as boolean} onChange={updateProperty(MapComponent, 'enableDebug')} />
       </InputGroup>
     </NodeEditor>
   )

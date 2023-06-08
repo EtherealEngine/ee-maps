@@ -1,14 +1,10 @@
 import { ComponentJson } from '@etherealengine/common/src/interfaces/SceneInterface'
-import { LoadGLTF } from '@etherealengine/engine/src/assets/functions/LoadGLTF'
 import { defaultAvatarHalfHeight } from '@etherealengine/engine/src/avatar/functions/spawnAvatarReceptor'
-import { DebugNavMeshComponent } from '@etherealengine/engine/src/debug/DebugNavMeshComponent'
+// import { DebugNavMeshComponent } from '@etherealengine/engine/src/debug/DebugNavMeshComponent'
 import { Engine } from '@etherealengine/engine/src/ecs/classes/Engine'
 import { EngineState } from '@etherealengine/engine/src/ecs/classes/EngineState'
 import { Entity } from '@etherealengine/engine/src/ecs/classes/Entity'
-import { addComponent, getAllComponents, getComponent, hasComponent } from '@etherealengine/engine/src/ecs/functions/ComponentFunctions'
-import { NavMeshComponent } from '@etherealengine/engine/src/navigation/component/NavMeshComponent'
-import { Object3DComponent } from '@etherealengine/engine/src/scene/components/Object3DComponent'
-import { registerSceneLoadPromise } from '@etherealengine/engine/src/scene/functions/SceneLoading'
+import { addComponent, defineQuery, getAllComponents, getComponent, hasComponent, setComponent } from '@etherealengine/engine/src/ecs/functions/ComponentFunctions'
 import { getState } from '@etherealengine/hyperflux'
 
 import { debounce } from 'lodash'
@@ -21,17 +17,24 @@ import { MapAction, mapReducer } from './MapReceptor'
 import { getPhases, startPhases } from './functions/PhaseFunctions'
 import { getStartCoords } from './getStartCoords'
 import { addChildFast, setPosition } from './util'
+import { NavMeshComponent } from './helpers/NavMeshComponent'
+import { GroupComponent, Object3DWithEntity } from '@etherealengine/engine/src/scene/components/GroupComponent'
+import { SceneAssetPendingTagComponent } from '@etherealengine/engine/src/scene/components/SceneAssetPendingTagComponent'
 
 export const SCENE_COMPONENT_MAP = 'map'
 export const SCENE_COMPONENT_MAP_DEFAULT_VALUES = {}
 
 export const deserializeMap = (entity: Entity, json: ComponentJson<MapComponentType>) => {
+  const sceneAssetPendingTagQuery = defineQuery([SceneAssetPendingTagComponent])
   if (isClient) {
-    registerSceneLoadPromise(createMap(entity, json.props as MapComponentType))
-    if (getState(EngineState).isEditor) {
-      const components = getAllComponents(entity)
-      components.push(SCENE_COMPONENT_MAP)
+    if(sceneAssetPendingTagQuery.length > 0) {
+      createMap(entity, json.props as MapComponentType)
     }
+    
+    // if (getState(EngineState).isEditor) {
+    //   const components = getAllComponents(entity)
+    //   components.push(SCENE_COMPONENT_MAP)
+    // }
   }
 }
 
@@ -45,26 +48,24 @@ export const createMap = async (entity: Entity, args: MapComponentType) => {
   addComponent(entity, MapComponent, args)
   const center = await getStartCoords(args)
 
-  const mapObject3D = new Group()
+  const mapObject3D = new Object3D() as Object3DWithEntity
   const navigationRaycastTarget = new Group()
 
   mapObject3D.name = '(Geographic) Map'
 
-  addComponent(entity, Object3DComponent, {
-    value: mapObject3D
-  })
+  addComponent(entity, GroupComponent, [mapObject3D])
+
   if (args.enableDebug) {
-    addComponent(entity, DebugNavMeshComponent, { object3d: new Group() })
+    // addComponent(entity, DebugNavMeshComponent, { object3d: new Group() })
   }
 
   const state = mapReducer(null, MapAction.initialize(center, args.scale?.x))
 
-  // TODO fix hardcoded URL
-  const spinnerGLTF = await LoadGLTF(getState(EngineState).publicPath + '/projects/ee-maps/EarthLowPoly.glb')
-  const spinner = spinnerGLTF.scene as Mesh
-  spinner.position.y = defaultAvatarHalfHeight * 2
-  spinner.position.z = -150
-  state.updateSpinner = spinner
+  // const spinnerGLTF = getState(EngineState).publicPath + '/projects/ee-maps/EarthLowPoly.glb'
+  // const spinner = spinnerGLTF as Mesh
+  // spinner.position.y = defaultAvatarHalfHeight * 2
+  // spinner.position.z = -150
+  // state.updateSpinner = spinner
 
   const updateTextContainer = new Text()
 

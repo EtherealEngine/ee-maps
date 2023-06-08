@@ -4,16 +4,16 @@ import { fromMetersFromCenter, LongLat } from './functions/UnitConversionFunctio
 import { addChildFast, multiplyArray, setPosition, vectorToArray } from './util'
 import { Vector3 } from 'three'
 import { Entity } from '@etherealengine/engine/src/ecs/classes/Entity'
-import { Object3DComponent } from '@etherealengine/engine/src/scene/components/Object3DComponent'
 import { getComponent, defineQuery, addComponent } from '@etherealengine/engine/src/ecs/functions/ComponentFunctions'
 import isIntersectCircleCircle from './functions/isIntersectCircleCircle'
 import { AvatarComponent } from '@etherealengine/engine/src/avatar/components/AvatarComponent'
-import { NavMeshComponent } from '@etherealengine/engine/src/navigation/component/NavMeshComponent'
 import { accessMapState } from './MapReceptor'
 import { Downgraded } from '@hookstate/core'
 import { getPhases, startPhases, resetPhases } from './functions/PhaseFunctions'
 import { TargetCameraRotationComponent } from '@etherealengine/engine/src/camera/components/TargetCameraRotationComponent'
 import { Engine } from '@etherealengine/engine/src/ecs/classes/Engine'
+import { GroupComponent } from '@etherealengine/engine/src/scene/components/GroupComponent'
+import { NavMeshComponent } from './helpers/NavMeshComponent'
 
 const PI2 = Math.PI * 2
 const $vector3 = new Vector3()
@@ -41,7 +41,7 @@ export default async function MapUpdateSystem(): Promise<any> {
     if (mapEntities.length > 1) console.warn('Not supported: More than one map!')
     const mapState = accessMapState().attach(Downgraded).get()
     const mapScale = mapState.scale
-    const object3dComponent = getComponent(mapEntity, Object3DComponent)
+    const object3dComponent = getComponent(mapEntity, GroupComponent)
     const viewerTransform = getComponent(viewerEntity, TransformComponent)
     const viewerPosition = vectorToArray(viewerTransform.position)
     const viewerPositionScaled = multiplyArray(viewerPosition, 1 / mapScale)
@@ -93,11 +93,11 @@ export default async function MapUpdateSystem(): Promise<any> {
       spinner.rotation.y = spinnerAngle
       spinnerAngle = (spinnerAngle + 0.01) % PI2
 
-      object3dComponent.value.children.length = 0
+      object3dComponent[0].children.length = 0
       navigationRaycastTarget.children.length = 0
-      object3dComponent.value.children[0] = spinner
+      object3dComponent[0].children[0] = spinner
 
-      object3dComponent.value.children[1] = mapState.updateTextContainer!
+      object3dComponent[0].children[1] = mapState.updateTextContainer!
 
       avatar.model!.visible = false
       addComponent(viewerEntity, TargetCameraRotationComponent, {
@@ -109,7 +109,7 @@ export default async function MapUpdateSystem(): Promise<any> {
       })
     } else if (mapState.activePhase === 'UpdateScene') {
       avatar.model!.visible = true
-      object3dComponent.value.children.length = 0
+      object3dComponent[0].children.length = 0
       for (const key of mapState.completeObjects.keys()) {
         const object = mapState.completeObjects.get(key)
         if (object.mesh) {
@@ -123,7 +123,7 @@ export default async function MapUpdateSystem(): Promise<any> {
             key[0] !== 'landuse_fallback'
           ) {
             setPosition(object.mesh, object.centerPoint)
-            addChildFast(object3dComponent.value, object.mesh)
+            addChildFast(object3dComponent[0], object.mesh)
           } else {
             object.mesh.parent = null
           }
@@ -140,7 +140,7 @@ export default async function MapUpdateSystem(): Promise<any> {
             )
           ) {
             setPosition(label.mesh, label.centerPoint)
-            addChildFast(object3dComponent.value, label.mesh)
+            addChildFast(object3dComponent[0], label.mesh)
           } else {
             label.mesh.parent = null
           }
@@ -158,7 +158,7 @@ export default async function MapUpdateSystem(): Promise<any> {
       }
       for (const helpers of mapState.helpersCache.values()) {
         if (helpers.tileNavMesh) {
-          addChildFast(object3dComponent.value, helpers.tileNavMesh)
+          addChildFast(object3dComponent[0], helpers.tileNavMesh)
         }
       }
 

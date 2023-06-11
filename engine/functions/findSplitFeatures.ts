@@ -10,9 +10,13 @@ type Group = [FeatureKey, Feature][]
 export default function* findSplitFeatures(keys: Iterator<FeatureKey>, features: Iterator<Feature>): Generator<Group> {
   const zipped = zipIterators<[FeatureKey, Feature]>(keys, features)
   const groups = new Map<GroupKey, Group>()
+  const groupSetFunction = (groupKey: GroupKey, groupValue: Group) => {
+    groups.set(groupKey, groupValue)
+    return groupValue
+  }
   const addToGroup = updateKeyVal(
     groups.get.bind(groups),
-    groups.set.bind(groups), // help needed!
+    groupSetFunction,
     (group: Group, newKey: FeatureKey, newFeature: Feature) => {
       return [...group, [newKey, newFeature]]
     },

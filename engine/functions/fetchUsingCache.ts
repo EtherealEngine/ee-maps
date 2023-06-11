@@ -24,3 +24,21 @@ export default function fetchUsingCache<CacheKey extends ITuple, Value>(
     )
   }
 }
+
+export function fetchUsingCacheAsync<CacheKey extends ITuple, Value>(
+  fetch: (state: MapStateUnwrapped, key: CacheKey, ...args: any[]) => Promise<Value>
+) {
+  return async (
+    cache: ParametricCache<CacheKey, Value>,
+    state: MapStateUnwrapped,
+    key: CacheKey,
+    ...extraArgs: any[]
+  ) => {
+    let value = cache.get(key)
+    if (!value) {
+      value = await fetch(state, key, ...extraArgs)
+      cache.set(key, value)
+    }
+    return value
+  }
+}

@@ -1,11 +1,11 @@
+import { TILE_ZOOM } from '../constants'
+import createSurroundingTileIterator from '../functions/createSurroundingTileIterator'
+import { fetchUsingCacheAsync } from '../functions/fetchUsingCache'
+import fetchVectorTile from '../functions/fetchVectorTile'
 import { MapStateUnwrapped, TaskStatus, TileKey } from '../types'
 import { VectorTile } from '../types'
-import createSurroundingTileIterator from '../functions/createSurroundingTileIterator'
-import { TILE_ZOOM } from '../constants'
-import fetchUsingCache from '../functions/fetchUsingCache'
-import fetchVectorTile from '../functions/fetchVectorTile'
 
-const fetchVectorTileUsingCache = fetchUsingCache<TileKey, VectorTile>(fetchVectorTile) // help needed!
+const fetchVectorTileUsingCache = fetchUsingCacheAsync<TileKey, VectorTile>(fetchVectorTile)
 
 export const name = 'FetchTiles'
 export const isAsyncPhase = true

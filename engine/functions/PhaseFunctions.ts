@@ -1,4 +1,5 @@
 import { isClient } from '@etherealengine/engine/src/common/functions/getEnvironment'
+
 import { TaskStatus } from '../types'
 import { ICachingPhase, IPhase, ISyncPhase, MapStateUnwrapped } from '../types'
 
@@ -69,28 +70,29 @@ export async function startPhases(state: MapStateUnwrapped, phases: readonly IPh
   // TODO remove
   const results = [] as any[]
   let result: any
+  const newState = { ...state }
 
   for (const phase of phases) {
     // console.log("starting phase", phase.name)
     const keys = phase.getTaskKeys(state)
     if (phase.isCachingPhase || phase.isAsyncPhase) {
-      state.activePhase = phase.name
+      newState.activePhase = phase.name
       // TODO remove
       const promises = [] as Promise<any>[]
       let promise: Promise<any>
       for (const key of keys) {
-        const taskStatus = phase.getTaskStatus(state, key)
+        const taskStatus = phase.getTaskStatus(newState, key)
         // console.log(`task key: ${key} status: ${taskStatus === TaskStatus.STARTED ? 'started' : 'not started'}`)
         if (taskStatus === TaskStatus.NOT_STARTED) {
           // console.log("starting task for", phase.name)
           if (phase.isAsyncPhase) {
-            promise = phase.startTask(state, key)
+            promise = phase.startTask(newState, key)
             promises.push(promise)
           } else {
-            result = (phase as ICachingPhase<any, any>).execTask(state, key)
+            result = (phase as ICachingPhase<any, any>).execTask(newState, key)
             results.push(result)
           }
-          ;(phase as ICachingPhase<any, any>).setTaskStatus(state, key, TaskStatus.STARTED)
+          ;(phase as ICachingPhase<any, any>).setTaskStatus(newState, key, TaskStatus.STARTED)
         }
       }
       results.push(...(await Promise.all(promises)))
@@ -98,12 +100,12 @@ export async function startPhases(state: MapStateUnwrapped, phases: readonly IPh
       for (const key of keys) {
         // console.log(`task key: ${key}`)
         // console.log("starting task", phase.name)
-        result = (phase as ISyncPhase<any, any>).execTask(state, key)
+        result = (phase as ISyncPhase<any, any>).execTask(newState, key)
         results.push(result)
       }
     }
-    phase.cleanup(state)
+    phase.cleanup(newState)
   }
-  state.activePhase = 'UpdateScene'
+  newState.activePhase = 'UpdateScene'
   return results
 }

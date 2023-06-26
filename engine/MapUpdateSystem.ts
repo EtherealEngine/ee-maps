@@ -1,4 +1,3 @@
-import { Downgraded } from '@hookstate/core'
 import { Vector3 } from 'three'
 
 import { AvatarComponent } from '@etherealengine/engine/src/avatar/components/AvatarComponent'
@@ -9,13 +8,14 @@ import { addComponent, defineQuery, getComponent } from '@etherealengine/engine/
 import { defineSystem } from '@etherealengine/engine/src/ecs/functions/SystemFunctions'
 import { GroupComponent } from '@etherealengine/engine/src/scene/components/GroupComponent'
 import { TransformComponent } from '@etherealengine/engine/src/transform/components/TransformComponent'
+import { defineActionQueue, getMutableState } from '@etherealengine/hyperflux'
 
 import isIntersectCircleCircle from './functions/isIntersectCircleCircle'
 import { getPhases, resetPhases, startPhases } from './functions/PhaseFunctions'
 import { fromMetersFromCenter, LongLat } from './functions/UnitConversionFunctions'
 import { NavMeshComponent } from './helpers/NavMeshComponent'
 import { MapComponent } from './MapComponent'
-import { accessMapState } from './MapReceptor'
+import { MapState, MapStateActions, MapStateReceptor, MapStateService } from './MapReceptor2'
 import { IPhase } from './types'
 import { addChildFast, multiplyArray, setPosition, vectorToArray } from './util'
 
@@ -30,6 +30,8 @@ const $previousMapCenterPoint: LongLat = Array(2)
 const mapsQuery = defineQuery([MapComponent])
 const viewerQuery = defineQuery([AvatarComponent])
 const navMeshQuery = defineQuery([NavMeshComponent])
+const mapStateInitializeActionQueue = defineActionQueue(MapStateActions.initialize.matches)
+const mapStateSetPropertyActionQueue = defineActionQueue(MapStateActions.setProperty.matches)
 
 let previousViewerEntity: Entity | null = null
 let spinnerAngle = 0
@@ -49,8 +51,12 @@ const execute = () => {
   if (!mapEntity || !viewerEntity) return
   if (mapEntities.length > 1) console.warn('Not supported: More than one map!')
 
-  const mapState = accessMapState().attach(Downgraded).get()
-  const mapScale = mapState.scale
+  // MAP STATE RECEPTORS
+  for (const action of mapStateInitializeActionQueue()) MapStateReceptor.mapInitializeActionReceptor(action)
+  for (const action of mapStateSetPropertyActionQueue()) MapStateReceptor.mapSetPropertyActionReceptor(action)
+
+  const mapState = getMutableState(MapState)
+  const mapScale = mapState.scale.value
   const object3dComponent = getComponent(mapEntity, GroupComponent)
   const viewerTransform = getComponent(viewerEntity, TransformComponent)
   const viewerPosition = vectorToArray(viewerTransform.position)
@@ -72,34 +78,35 @@ const execute = () => {
     $normalScaleViewerPositionDelta[1] * $normalScaleViewerPositionDelta[1]
 
   const wasRefreshTriggered =
-    viewerDistanceFromCenterSquared >= mapState.triggerRefreshRadius * mapState.triggerRefreshRadius
+    viewerDistanceFromCenterSquared >= mapState.triggerRefreshRadius.value * mapState.triggerRefreshRadius.value
   const wasMapCenterUpdated =
     typeof $previousMapCenterPoint[0] !== 'undefined' &&
     typeof $previousMapCenterPoint[1] !== 'undefined' &&
-    ($previousMapCenterPoint[0] !== mapState.center[0] || $previousMapCenterPoint[1] !== mapState.center[1])
+    ($previousMapCenterPoint[0] !== mapState.center.value[0] || $previousMapCenterPoint[1] !== mapState.center.value[1])
 
   if (wasMapCenterUpdated) {
-    mapState.viewerPosition[0] = $previousViewerPosition[0] = 0
-    mapState.viewerPosition[1] = $previousViewerPosition[1] = 0
+    mapState.viewerPosition.value[0] = $previousViewerPosition[0] = 0
+    mapState.viewerPosition.value[1] = $previousViewerPosition[1] = 0
     viewerTransform.position.set(0, 0, 0)
-    resetPhases(mapState, phases)
+    resetPhases(mapState.value, phases)
   }
 
   if (wasRefreshTriggered || wasMapCenterUpdated) {
-    mapState.center = fromMetersFromCenter($normalScaleViewerPositionDelta, mapState.center)
-    mapState.viewerPosition = viewerPosition
-    startPhases(mapState, phases)
+    const tempMapState = { ...mapState.value }
+    tempMapState.center = fromMetersFromCenter($normalScaleViewerPositionDelta, tempMapState.center)
+    tempMapState.viewerPosition = viewerPosition
+    startPhases(tempMapState, phases)
 
     $previousViewerPosition.copy(viewerTransform.position)
     $previousViewerPosition.y = 0
   }
 
-  $previousMapCenterPoint[0] = mapState.center[0]
-  $previousMapCenterPoint[1] = mapState.center[1]
+  $previousMapCenterPoint[0] = mapState.center.value[0]
+  $previousMapCenterPoint[1] = mapState.center.value[1]
 
   // Perf hack: Start with an empty array so that any children that have been purged or that do not meet the criteria for adding are implicitly removed.
-  if (mapState.updateSpinner && mapState.activePhase !== null && mapState.completeObjects.size === 0) {
-    const spinner = mapState.updateSpinner
+  if (mapState.updateSpinner && mapState.activePhase !== null && mapState.completeObjects.value.size === 0) {
+    const spinner = mapState.updateSpinner.value!
     spinner.rotation.y = spinnerAngle
     spinnerAngle = (spinnerAngle + 0.01) % PI2
 
@@ -107,7 +114,7 @@ const execute = () => {
     navigationRaycastTarget.children.length = 0
     object3dComponent[0].children[0] = spinner
 
-    object3dComponent[0].children[1] = mapState.updateTextContainer!
+    object3dComponent[0].children[1] = mapState.updateTextContainer.value!
 
     avatar.model!.visible = false
     addComponent(viewerEntity, TargetCameraRotationComponent, {
@@ -117,16 +124,16 @@ const execute = () => {
       phiVelocity: { value: Math.PI },
       thetaVelocity: { value: Math.PI }
     })
-  } else if (mapState.activePhase === 'UpdateScene') {
+  } else if (mapState.activePhase.value === 'UpdateScene') {
     avatar.model!.visible = true
     object3dComponent[0].children.length = 0
-    for (const key of mapState.completeObjects.keys()) {
-      const object = mapState.completeObjects.get(key)
+    for (const key of mapState.completeObjects.value.keys()) {
+      const object = mapState.completeObjects.value.get(key)
       if (object.mesh) {
         if (
           isIntersectCircleCircle(
             viewerPositionScaled,
-            mapState.minimumSceneRadius * mapState.scale,
+            mapState.minimumSceneRadius.value * mapState.scale.value,
             object.centerPoint,
             object.boundingCircleRadius
           ) &&
@@ -139,12 +146,12 @@ const execute = () => {
         }
       }
     }
-    for (const label of mapState.labelCache.values()) {
+    for (const label of mapState.labelCache.value.values()) {
       if (label.mesh) {
         if (
           isIntersectCircleCircle(
             viewerPositionScaled,
-            mapState.labelRadius * mapState.scale,
+            mapState.labelRadius.value * mapState.scale.value,
             label.centerPoint,
             label.boundingCircleRadius
           )
@@ -157,33 +164,33 @@ const execute = () => {
       }
     }
     // navigationRaycastTarget.children.length = 0
-    for (const key of mapState.completeObjects.keys()) {
+    for (const key of mapState.completeObjects.value.keys()) {
       const layerName = key[0]
       if (layerName === 'landuse_fallback') {
-        const { mesh, centerPoint } = mapState.completeObjects.get(key)
+        const { mesh, centerPoint } = mapState.completeObjects.value.get(key)
         setPosition(mesh, centerPoint)
 
         addChildFast(navigationRaycastTarget, mesh)
       }
     }
-    for (const helpers of mapState.helpersCache.values()) {
+    for (const helpers of mapState.helpersCache.value.values()) {
       if (helpers.tileNavMesh) {
         addChildFast(object3dComponent[0], helpers.tileNavMesh)
       }
     }
 
     // Update (sub)scene
-    mapState.activePhase = null
+    MapStateService.setProperty({ activePhase: null })
   }
 
   // Update labels
   if (Math.round(Engine.instance.elapsedSeconds / Engine.instance.fixedDeltaSeconds) % 20 === 0) {
-    for (const label of mapState.labelCache.values()) {
+    for (const label of mapState.labelCache.value.values()) {
       if (label.mesh) {
         if (
           isIntersectCircleCircle(
             viewerPositionScaled,
-            mapState.labelRadius * mapState.scale,
+            mapState.labelRadius.value * mapState.scale.value,
             label.centerPoint,
             label.boundingCircleRadius
           )

@@ -20,13 +20,13 @@ import {
 } from '@etherealengine/engine/src/ecs/functions/ComponentFunctions'
 import { GroupComponent, Object3DWithEntity } from '@etherealengine/engine/src/scene/components/GroupComponent'
 import { SceneAssetPendingTagComponent } from '@etherealengine/engine/src/scene/components/SceneAssetPendingTagComponent'
-import { getState } from '@etherealengine/hyperflux'
+import { getMutableState, getState } from '@etherealengine/hyperflux'
 
 import { getPhases, startPhases } from './functions/PhaseFunctions'
 import { getStartCoords } from './getStartCoords'
 import { NavMeshComponent } from './helpers/NavMeshComponent'
 import { MapComponent, MapComponentType } from './MapComponent'
-import { MapAction, mapReducer } from './MapReceptor'
+import { MapState, MapStateService } from './MapReceptor2'
 import { addChildFast, setPosition } from './util'
 
 export const SCENE_COMPONENT_MAP = 'map'
@@ -71,7 +71,9 @@ export const createMap = async (entity: Entity, args: MapComponentType) => {
 
   console.log('map_functions_create_map')
 
-  const state = mapReducer(null, MapAction.initialize(center, args.scale?.x))
+  MapStateService.initializeMap(center, args.scale?.x)
+
+  const state = getMutableState(MapState)
 
   // const spinnerGLTF = getState(EngineState).publicPath + '/projects/ee-maps/EarthLowPoly.glb'
   // const spinner = spinnerGLTF as Mesh
@@ -94,11 +96,10 @@ export const createMap = async (entity: Entity, args: MapComponentType) => {
 
   updateTextContainer.sync()
 
-  state.updateTextContainer = updateTextContainer
+  const tempState = { ...state.value, updateTextContainer }
+  await startPhases(tempState, await getPhases({ exclude: ['navigation'] }))
 
-  await startPhases(state, await getPhases({ exclude: ['navigation'] }))
-
-  navigationRaycastTarget.scale.setScalar(state.scale)
+  navigationRaycastTarget.scale.setScalar(state.scale.value)
   Engine.instance.scene.add(navigationRaycastTarget)
 
   addComponent(entity, NavMeshComponent, {
@@ -112,7 +113,6 @@ export const createMap = async (entity: Entity, args: MapComponentType) => {
 
 export const _updateMap = async (entity: Entity, props: any) => {
   // only update on some property changes
-  console.log('props_update_map', Object.keys(props)) 
 
   // if (
   //   !(
@@ -131,17 +131,18 @@ export const _updateMap = async (entity: Entity, props: any) => {
   const subSceneChildren = []
   const subScene = this as unknown as Object3D
 
-  const state = mapReducer(null, MapAction.initialize(center, args.scale?.x))
+  MapStateService.initializeMap(center, args.scale?.x)
+  const state = getMutableState(MapState)
 
-  await startPhases(state, await getPhases({ exclude: ['navigation'] }))
+  await startPhases(state.value, await getPhases({ exclude: ['navigation'] }))
 
-  for (const object of state.completeObjects.values()) {
+  for (const object of state.completeObjects.value.values()) {
     if (object.mesh) {
       setPosition(object.mesh, object.centerPoint)
       addChildFast(subScene, object.mesh, subSceneChildren)
     }
   }
-  for (const object of state.labelCache.values()) {
+  for (const object of state.labelCache.value.values()) {
     if (object.mesh) {
       setPosition(object.mesh, object.centerPoint)
       addChildFast(subScene, object.mesh, subSceneChildren)

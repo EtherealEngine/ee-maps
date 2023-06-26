@@ -3,7 +3,7 @@ import { BufferGeometry, InstancedBufferGeometry, Mesh } from 'three'
 
 import type _FeatureKey from './classes/FeatureKey'
 import type _TileKey from './classes/TileKey'
-import { MapState } from './MapReceptor2'
+import { MapState } from './MapReceptor'
 
 export type TileKey = _TileKey
 

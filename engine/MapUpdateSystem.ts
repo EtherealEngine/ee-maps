@@ -15,7 +15,7 @@ import { getPhases, resetPhases, startPhases } from './functions/PhaseFunctions'
 import { fromMetersFromCenter, LongLat } from './functions/UnitConversionFunctions'
 import { NavMeshComponent } from './helpers/NavMeshComponent'
 import { MapComponent } from './MapComponent'
-import { MapState, MapStateActions, MapStateReceptor, MapStateService } from './MapReceptor2'
+import { MapState, MapStateActions, MapStateReceptor, MapStateService } from './MapReceptor'
 import { IPhase } from './types'
 import { addChildFast, multiplyArray, setPosition, vectorToArray } from './util'
 

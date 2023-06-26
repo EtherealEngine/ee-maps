@@ -26,7 +26,7 @@ import { getPhases, startPhases } from './functions/PhaseFunctions'
 import { getStartCoords } from './getStartCoords'
 import { NavMeshComponent } from './helpers/NavMeshComponent'
 import { MapComponent, MapComponentType } from './MapComponent'
-import { MapState, MapStateService } from './MapReceptor2'
+import { MapState, MapStateService } from './MapReceptor'
 import { addChildFast, setPosition } from './util'
 
 export const SCENE_COMPONENT_MAP = 'map'

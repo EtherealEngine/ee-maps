@@ -17,6 +17,7 @@ const geometryLoader = new BufferGeometryLoader()
 
 /** using fetchUsingCache since createGeometry returns a promise */
 const createGeometryUsingCache = fetchUsingCache(async (state: MapStateUnwrapped, key: FeatureKey) => {
+  console.log('CreateGeometryPhase--->')
   const { feature, centerPoint, boundingCircleRadius } = state.transformedFeatureCache.get(key)
   const [layerName] = key
   const styles = getFeatureStyles(DEFAULT_FEATURE_STYLES, layerName, feature.properties.class)
@@ -44,6 +45,7 @@ export const isAsyncPhase = true
 export const isCachingPhase = true
 
 export function* getTaskKeys(state: MapStateUnwrapped) {
+  console.log('CreateGeometryPhase_2--->')
   const viewerPositionScaled = multiplyArray(state.viewerPosition, 1 / state.scale, $array2) as [number, number]
   for (const key of state.transformedFeatureCache.keys()) {
     const { centerPoint, boundingCircleRadius } = state.transformedFeatureCache.get(key)
@@ -62,6 +64,7 @@ export function setTaskStatus(state: MapStateUnwrapped, key: FeatureKey, status:
 }
 
 export function startTask(state: MapStateUnwrapped, key: FeatureKey) {
+  console.log('CreateGeometryPhase_3--->')
   return createGeometryUsingCache(state.geometryCache as any, state, key)
 }
 

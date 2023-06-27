@@ -3,6 +3,7 @@ import { ITuple, MapStateUnwrapped } from '../types'
 export default function createUsingGetSet<CacheKey extends ITuple, Value>(
   create: (state: MapStateUnwrapped, key: CacheKey, ...args: any[]) => Value
 ) {
+  console.log("CREATEUSINGGETSET__FN");
   return (
     get: (key: CacheKey) => Value,
     set: (key: CacheKey, value: Value) => any,

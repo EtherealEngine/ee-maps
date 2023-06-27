@@ -8,6 +8,7 @@ export default function createCompleteObject(
   geometryPhaseResult: MapDerivedFeatureGeometry,
   feature: SupportedFeature
 ): MapDerivedFeatureComplete {
+  console.log("CREATECOMPLETEOBJECT__FN");
   const { color, extrude, zIndex = 0 } = getFeatureStyles(DEFAULT_FEATURE_STYLES, layerName, feature.properties.class)
 
   const materialParams = {

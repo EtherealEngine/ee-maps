@@ -14,6 +14,7 @@ function roundEach(array: any[]) {
 }
 
 export default function computePolygonDifference(subjectGeometry: Polygon, ...clippingGeometries: Polygon[]) {
+  console.log("COMPUTEPOLYGONDIFF__FN")
   // Quick and dirty fix for polygon-clipping's floating point woes
   roundEach(clippingGeometries)
   return pc.difference([subjectGeometry], ...clippingGeometries)

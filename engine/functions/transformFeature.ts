@@ -34,6 +34,7 @@ export default function transformFeature<FeatureType extends SupportedFeature>(
   feature: FeatureType,
   center: LongLat
 ): MapTransformedFeature {
+  console.log("transformFeature__FN");
   const centerPointLongLat = turf.center(feature).geometry.coordinates
   const centerPoint = toMetersFromCenter(centerPointLongLat, center) as [number, number]
   let transformedFeature = feature

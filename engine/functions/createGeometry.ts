@@ -43,6 +43,7 @@ function colorVertices(geometry: BufferGeometry, baseColor: Color, light: Color,
 }
 
 export default function createGeometry(feature: SupportedFeature, style: IStyles): BufferGeometry {
+  console.log("CREATEGEOMETRY__FN");
   const shape = new Shape()
 
   let coords: LongLat[]

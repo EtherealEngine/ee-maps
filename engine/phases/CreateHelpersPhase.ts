@@ -7,6 +7,7 @@ export const isAsyncPhase = false
 export const isCachingPhase = true
 
 const createHelpersUsingCache = createUsingCache((state: MapStateUnwrapped, key: TileKey) => {
+  console.log('CreateHelpersUsingCache--->')
   const polygons = state.tileNavMeshCache.get(key)
   // const tileNavMesh = createPolygonHelper(polygons[0])
   const tileNavMesh = createConvexMultiPolygonHelper(polygons)
@@ -17,6 +18,7 @@ const createHelpersUsingCache = createUsingCache((state: MapStateUnwrapped, key:
 })
 
 export function getTaskKeys(state: MapStateUnwrapped) {
+  console.log('CreateHelpersUsingCache_2--->')
   return state.tileNavMeshCache.keys()
 }
 
@@ -28,6 +30,7 @@ export function setTaskStatus(state: MapStateUnwrapped, key: TileKey, status: Ta
 }
 
 export function execTask(state: MapStateUnwrapped, key: TileKey) {
+  console.log('CreateHelpersUsingCache_3--->')
   return createHelpersUsingCache(state.helpersCache, state, key)
 }
 

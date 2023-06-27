@@ -4,7 +4,7 @@ import { VectorTile } from '../types'
 import { vectors } from '../vectors'
 import getMapboxUrl from './getMapboxUrl'
 
-export default async function fetchVectorTile(_: any, key: TileKey): Promise<VectorTile> {
+export default async function fetchVectorTile(_: any, key: TileKey): Promise<VectorTile> {  console.log("GETCHVECTOR__FN");
   const [x, y] = key
   const url = getMapboxUrl(
     'mapbox.mapbox-streets-v8',

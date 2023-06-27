@@ -22,6 +22,7 @@ const transformFeatureUsingCache = fetchUsingCache((state: MapStateUnwrapped, ke
 })
 
 export function getTaskKeys(state: MapStateUnwrapped) {
+  console.log('TransformPhase--->')
   return state.featureCache.keys()
 }
 
@@ -33,6 +34,7 @@ export function setTaskStatus(state: MapStateUnwrapped, key: FeatureKey, status:
 }
 
 export function startTask(state: MapStateUnwrapped, key: FeatureKey) {
+  console.log('TransformPhase_2--->')
   return transformFeatureUsingCache(state.transformedFeatureCache as any, state, key)
 }
 

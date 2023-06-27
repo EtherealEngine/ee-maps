@@ -6,10 +6,12 @@ export const isAsyncPhase = false
 export const isCachingPhase = false
 
 export function* getTaskKeys() {
+  console.log('UnifyFeatures--->')
   yield null
 }
 
 export function execTask(state: MapStateUnwrapped) {
+  console.log('UnifyFeatures_2--->')
   unifyCachedFeatures(state.featureCache)
 }
 

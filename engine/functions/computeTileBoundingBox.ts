@@ -10,6 +10,7 @@ export default function computeTileBoundingBox(
   center: LongLat,
   target: BBox = Array(4) as any
 ): BBox {
+  console.log("COMPUTETILEBOUNDING__FN");
   toMetersFromCenter([tileXToLong(x, TILE_ZOOM), tileYToLat(y, TILE_ZOOM)], center, $array2)
 
   const [x1, y1] = $array2

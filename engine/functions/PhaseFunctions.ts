@@ -56,11 +56,13 @@ Object.freeze(defaultPhases)
 Object.freeze(phasesNoNavigation)
 
 export async function getPhases(options: { exclude?: FeatureId[] } = {}): Promise<readonly IPhase<any, any>[]> {
+  console.log('GETPHASES-PHASES-CALLED--->')
   const exclude = options.exclude || []
   return Promise.all(exclude.includes('navigation') ? phasesNoNavigation : defaultPhases)
 }
 
 export function resetPhases(state: MapStateUnwrapped, phases: readonly IPhase<any, any>[]) {
+  console.log('RESET-PHASES-CALLED--->')
   for (const phase of phases) {
     phase.reset(state)
   }
@@ -68,6 +70,7 @@ export function resetPhases(state: MapStateUnwrapped, phases: readonly IPhase<an
 
 export async function startPhases(state: MapStateUnwrapped, phases: readonly IPhase<any, any>[]) {
   // TODO remove
+  console.log('START-PHASES-CALLED--->')
   const results = [] as any[]
   let result: any
   const newState = { ...state }

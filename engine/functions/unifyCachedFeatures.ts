@@ -7,6 +7,7 @@ import unifyFeatures from './unifyFeatures'
 const allowedGeometryTypes: Feature['geometry']['type'][] = ['Polygon', 'MultiPolygon']
 
 export default function unifyCachedFeatures(cache: FeatureCache<Feature>) {
+  console.log("unifyCACHE__FN");
   for (const splitFeature of findSplitFeatures(cache.keys(), cache.values())) {
     const firstKey = splitFeature[0][0]
     const features = splitFeature.map(([_, feature]) => feature)

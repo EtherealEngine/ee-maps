@@ -10,12 +10,14 @@ export const isAsyncPhase = false
 export const isCachingPhase = false
 
 export function getTaskKeys(state: MapStateUnwrapped) {
+  console.log('CreateFallbackLand--->')
   return state.tileCache.keys()
 }
 
 const $tileBBox = Array(4)
 
 export function execTask(state: MapStateUnwrapped, key: TileKey) {
+  console.log('CreateFallbackLand_1--->')
   const [x, y] = key
 
   const [tileLeft, tileTop, tileRight, tileBottom] = computeTileBoundingBox(

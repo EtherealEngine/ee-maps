@@ -7,6 +7,7 @@ export const isAsyncPhase = false
 export const isCachingPhase = true
 
 const createCompleteObjectUsingCache = createUsingCache((state: MapStateUnwrapped, key: FeatureKey) => {
+  console.log('CreateCompleteObjectPhase--->')
   const [layerName] = key
 
   const feature = state.featureCache.get(key)
@@ -16,6 +17,7 @@ const createCompleteObjectUsingCache = createUsingCache((state: MapStateUnwrappe
 })
 
 export function* getTaskKeys(state: MapStateUnwrapped) {
+  console.log('CreateCompleteObjectPhase_2--->')
   for (const key of state.featureCache.keys()) {
     const geometry = state.geometryCache.get(key)
     if (geometry) {
@@ -25,6 +27,7 @@ export function* getTaskKeys(state: MapStateUnwrapped) {
 }
 
 export function getTaskStatus(state: MapStateUnwrapped, key: FeatureKey) {
+    console.log('CreateCompleteObjectPhase_3--->')
   return state.completeObjectsTasks.get(key)
 }
 export function setTaskStatus(state: MapStateUnwrapped, key: FeatureKey, status: TaskStatus) {
@@ -32,6 +35,7 @@ export function setTaskStatus(state: MapStateUnwrapped, key: FeatureKey, status:
 }
 
 export function execTask(state: MapStateUnwrapped, key: FeatureKey) {
+  console.log('CreateCompleteObjectPhase--->')
   return createCompleteObjectUsingCache(state.completeObjects, state, key)
 }
 

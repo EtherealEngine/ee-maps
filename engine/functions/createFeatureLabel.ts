@@ -64,6 +64,7 @@ export default function createFeatureLabel(
   lineString: Feature<LineString>,
   mapCenterPoint: LongLat
 ): MapFeatureLabel {
+  console.log("CREATEFEATURELABEL__FN");
   const lineLen = turf.length(lineString)
   const middleSlice = turf.lineSliceAlong(lineString, lineLen * 0.48, lineLen * 0.52).geometry.coordinates
 

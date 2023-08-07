@@ -8,6 +8,7 @@ export const isAsyncPhase = false
 export const isCachingPhase = true
 
 export function* getTaskKeys(state: MapStateUnwrapped) {
+  console.log('CreateLabelPhase--->')
   for (const key of state.completeObjects.keys()) {
     const feature = state.featureCache.get(key)
     const transformed = state.transformedFeatureCache.get(key)
@@ -38,6 +39,7 @@ const createLabelUsingCache = createUsingCache((state: MapStateUnwrapped, key: F
 })
 
 export function execTask(state: MapStateUnwrapped, key: FeatureKey) {
+  console.log('CreateLabelPhase_2--->')
   return createLabelUsingCache(state.labelCache, state, key)
 }
 

@@ -8,7 +8,7 @@ export default function createWorkerFunction<
   worker: Worker
 ): (...args: { [I in keyof HandlerArgs]: Comlink.UnproxyOrClone<HandlerArgs[I]> }) => Promise<HandlerResult> {
   const api = Comlink.wrap<WorkerApi>(worker)
-
+  console.log("CREATEWORKER__FN");
   return async function workerFunction(...args: { [I in keyof HandlerArgs]: Comlink.UnproxyOrClone<HandlerArgs[I]> }) {
     return (await api.handle(...args)) as Promise<HandlerResult>
   }

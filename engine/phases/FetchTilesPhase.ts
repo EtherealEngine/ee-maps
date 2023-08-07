@@ -1,17 +1,18 @@
+import { TILE_ZOOM } from '../constants'
+import createSurroundingTileIterator from '../functions/createSurroundingTileIterator'
+import { fetchUsingCacheAsync } from '../functions/fetchUsingCache'
+import fetchVectorTile from '../functions/fetchVectorTile'
 import { MapStateUnwrapped, TaskStatus, TileKey } from '../types'
 import { VectorTile } from '../types'
-import createSurroundingTileIterator from '../functions/createSurroundingTileIterator'
-import { TILE_ZOOM } from '../constants'
-import fetchUsingCache from '../functions/fetchUsingCache'
-import fetchVectorTile from '../functions/fetchVectorTile'
 
-const fetchVectorTileUsingCache = fetchUsingCache<TileKey, VectorTile>(fetchVectorTile)
+const fetchVectorTileUsingCache = fetchUsingCacheAsync<TileKey, VectorTile>(fetchVectorTile)
 
 export const name = 'FetchTiles'
 export const isAsyncPhase = true
 export const isCachingPhase = true
 
 export function getTaskKeys(state: MapStateUnwrapped) {
+  console.log('FetchVector--->')
   return createSurroundingTileIterator(state.center, state.minimumSceneRadius, TILE_ZOOM)
 }
 
@@ -23,6 +24,7 @@ export function setTaskStatus(state: MapStateUnwrapped, key: TileKey, status: Ta
 }
 
 export function startTask(state: MapStateUnwrapped, key: TileKey) {
+  console.log('FetchVector_2--->')
   return fetchVectorTileUsingCache(state.tileCache, state, key)
 }
 

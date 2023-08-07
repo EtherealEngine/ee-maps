@@ -18,6 +18,7 @@ export default function transformGeometry<Coordinates extends Position[] | Posit
   coordTarget = coordSource
 ) {
   // TODO use ts-matches
+  console.log("transformGeometry__FN");
   switch (type) {
     case 'LineString':
       transformRing(coordSource as Position[], transformer)

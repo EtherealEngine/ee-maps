@@ -1,6 +1,7 @@
 import matches from 'ts-matches'
 import { FeatureKey, TileKey } from '../types'
 export default function checkKey(key: FeatureKey | TileKey) {
+  console.log("CHECKKEY__FN")
   matches(key)
     .when(matches.tuple(matches.number, matches.number), () => {})
     .when(matches.tuple(matches.string, matches.number, matches.number, matches.string), () => {})

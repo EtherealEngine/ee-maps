@@ -19,6 +19,7 @@ export function indexedVerticesToGeoJSONTriangles(indexes: number[], vertices: n
 }
 
 export default function tesselatePolygon(polygon: Polygon) {
+  console.log("tesselatePolygon__FN");
   const { vertices, holes } = earcut.flatten(polygon)
   const indexes = earcut(vertices, holes, 2)
   return indexedVerticesToGeoJSONTriangles(indexes, vertices)

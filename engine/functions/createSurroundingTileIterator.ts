@@ -12,6 +12,7 @@ export default function* createSurroundingTileIterator(
   minimumSceneRadius: number,
   zoomLevel: number
 ): Generator<TileKey> {
+  console.log("CREATESURROUNDING__FN");
   const [startLong, startLat] = fromMetersFromCenter([-minimumSceneRadius, -minimumSceneRadius], center)
   const [endLong, endLat] = fromMetersFromCenter([minimumSceneRadius, minimumSceneRadius], center)
 

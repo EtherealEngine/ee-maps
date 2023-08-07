@@ -3,21 +3,21 @@ import fetchUsingCache from '../functions/fetchUsingCache'
 import isIntersectCircleCircle from '../functions/isIntersectCircleCircle'
 import { FeatureKey, TaskStatus, MapStateUnwrapped } from '../types'
 import { multiplyArray } from '../util'
-// @ts-ignore
-import createGeometryWorker from '../workers/geometryWorker.ts?worker'
 import { WorkerApi } from '../workers/geometryWorker'
 import { DEFAULT_FEATURE_STYLES, getFeatureStyles } from '../styles'
 import { BufferGeometryLoader } from 'three'
 import { getHumanFriendlyFeatureKey } from '../helpers/KeyHelpers'
+import { createWorkerFromCrossOriginURL } from '@etherealengine/common/src/utils/createWorkerFromCrossOriginURL'
 
 const $array2 = Array(2)
 
-const createGeometry = createWorkerFunction<WorkerApi>(createGeometryWorker())
+const createGeometry = createWorkerFunction<WorkerApi>(createWorkerFromCrossOriginURL(new URL('../workers/geometryWorker.ts', import.meta.url).href, true, {name: "Geometry Worker"}))
 
 const geometryLoader = new BufferGeometryLoader()
 
 /** using fetchUsingCache since createGeometry returns a promise */
 const createGeometryUsingCache = fetchUsingCache(async (state: MapStateUnwrapped, key: FeatureKey) => {
+  console.log('CreateGeometryPhase--->')
   const { feature, centerPoint, boundingCircleRadius } = state.transformedFeatureCache.get(key)
   const [layerName] = key
   const styles = getFeatureStyles(DEFAULT_FEATURE_STYLES, layerName, feature.properties.class)
@@ -45,6 +45,7 @@ export const isAsyncPhase = true
 export const isCachingPhase = true
 
 export function* getTaskKeys(state: MapStateUnwrapped) {
+  console.log('CreateGeometryPhase_2--->')
   const viewerPositionScaled = multiplyArray(state.viewerPosition, 1 / state.scale, $array2) as [number, number]
   for (const key of state.transformedFeatureCache.keys()) {
     const { centerPoint, boundingCircleRadius } = state.transformedFeatureCache.get(key)
@@ -63,7 +64,8 @@ export function setTaskStatus(state: MapStateUnwrapped, key: FeatureKey, status:
 }
 
 export function startTask(state: MapStateUnwrapped, key: FeatureKey) {
-  return createGeometryUsingCache(state.geometryCache, state, key)
+  console.log('CreateGeometryPhase_3--->')
+  return createGeometryUsingCache(state.geometryCache as any, state, key)
 }
 
 export function cleanup(state: MapStateUnwrapped) {

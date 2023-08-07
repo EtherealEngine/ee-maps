@@ -1,7 +1,7 @@
 import { TileKey, MapStateUnwrapped } from '../types'
 import { DEFAULT_FEATURE_STYLES, getFeatureStyles, MAX_Z_INDEX } from '../styles'
 import getCachedMaterial from '../functions/getCachedMaterial'
-import { Mesh, MeshLambertMaterial, PlaneBufferGeometry } from 'three'
+import { Mesh, MeshLambertMaterial, PlaneGeometry } from 'three'
 import computeTileBoundingBox from '../functions/computeTileBoundingBox'
 import FeatureKey from '../classes/FeatureKey'
 
@@ -10,12 +10,14 @@ export const isAsyncPhase = false
 export const isCachingPhase = false
 
 export function getTaskKeys(state: MapStateUnwrapped) {
+  console.log('CreateFallbackLand--->')
   return state.tileCache.keys()
 }
 
 const $tileBBox = Array(4)
 
 export function execTask(state: MapStateUnwrapped, key: TileKey) {
+  console.log('CreateFallbackLand_1--->')
   const [x, y] = key
 
   const [tileLeft, tileTop, tileRight, tileBottom] = computeTileBoundingBox(
@@ -33,7 +35,7 @@ export function execTask(state: MapStateUnwrapped, key: TileKey) {
 
   const material = getCachedMaterial(MeshLambertMaterial, { color, depthTest: false })
 
-  const geometry = new PlaneBufferGeometry(tileWidth, tileHeight)
+  const geometry = new PlaneGeometry(tileWidth, tileHeight)
 
   geometry.rotateX(-Math.PI / 2)
   const mesh = new Mesh(geometry, material)

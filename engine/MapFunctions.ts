@@ -1,65 +1,85 @@
-import { getStartCoords } from './getStartCoords'
-import { MapComponentType } from './MapComponent'
-import { addComponent, getComponent, hasComponent } from '@etherealengine/engine/src/ecs/functions/ComponentFunctions'
-import { DebugNavMeshComponent } from '@etherealengine/engine/src/debug/DebugNavMeshComponent'
-import { Entity } from '@etherealengine/engine/src/ecs/classes/Entity'
-import { Object3D, Group, Mesh } from 'three'
-import { Engine } from '@etherealengine/engine/src/ecs/classes/Engine'
-import { NavMeshComponent } from '@etherealengine/engine/src/navigation/component/NavMeshComponent'
-import { MapAction, mapReducer } from './MapReceptor'
-import { MapComponent } from './MapComponent'
-import { getPhases, startPhases } from './functions/PhaseFunctions'
-import { LoadGLTF } from '@etherealengine/engine/src/assets/functions/LoadGLTF'
-import { avatarHalfHeight } from '@etherealengine/engine/src/avatar/functions/createAvatar'
-import { Text } from 'troika-three-text'
-import { Object3DComponent } from '@etherealengine/engine/src/scene/components/Object3DComponent'
-import { ComponentJson } from '@etherealengine/common/src/interfaces/SceneInterface'
-import { isClient } from '@etherealengine/engine/src/common/functions/isClient'
-import { registerSceneLoadPromise } from '@etherealengine/engine/src/scene/functions/SceneLoading'
-import { EntityNodeComponent } from '@etherealengine/engine/src/scene/components/EntityNodeComponent'
-import { addChildFast, setPosition } from './util'
 import { debounce } from 'lodash'
+import { Group, Mesh, Object3D } from 'three'
+import { Text } from 'troika-three-text'
+
+import { ComponentJson } from '@etherealengine/common/src/interfaces/SceneInterface'
+import { defaultAvatarHalfHeight } from '@etherealengine/engine/src/avatar/functions/spawnAvatarReceptor'
+import { isClient } from '@etherealengine/engine/src/common/functions/getEnvironment'
+// import { DebugNavMeshComponent } from '@etherealengine/engine/src/debug/DebugNavMeshComponent'
+import { Engine } from '@etherealengine/engine/src/ecs/classes/Engine'
+import { EngineState } from '@etherealengine/engine/src/ecs/classes/EngineState'
+import { Entity } from '@etherealengine/engine/src/ecs/classes/Entity'
+import {
+  addComponent,
+  ComponentType,
+  defineQuery,
+  getAllComponents,
+  getComponent,
+  hasComponent,
+  setComponent
+} from '@etherealengine/engine/src/ecs/functions/ComponentFunctions'
+import { GroupComponent, Object3DWithEntity } from '@etherealengine/engine/src/scene/components/GroupComponent'
+import { SceneAssetPendingTagComponent } from '@etherealengine/engine/src/scene/components/SceneAssetPendingTagComponent'
+import { getMutableState, getState } from '@etherealengine/hyperflux'
+
+import { getPhases, startPhases } from './functions/PhaseFunctions'
+import { getStartCoords } from './getStartCoords'
+import { NavMeshComponent } from './helpers/NavMeshComponent'
+import { MapComponent, MapComponentType } from './MapComponent'
+import { MapState, MapStateService } from './MapReceptor'
+import { addChildFast, setPosition } from './util'
 
 export const SCENE_COMPONENT_MAP = 'map'
 export const SCENE_COMPONENT_MAP_DEFAULT_VALUES = {}
 
-export const deserializeMap = (entity: Entity, json: ComponentJson<MapComponentType>) => {
+export const deserializeMap = (entity: Entity, json: ComponentJson<typeof MapComponent>) => {
+  console.log('deserialize_map')
+  const sceneAssetPendingTagQuery = defineQuery([SceneAssetPendingTagComponent])
+  console.log('sceneassetpending', sceneAssetPendingTagQuery.length)
   if (isClient) {
-    registerSceneLoadPromise(createMap(entity, json.props))
-    if (Engine.isEditor) getComponent(entity, EntityNodeComponent)?.components.push(SCENE_COMPONENT_MAP)
+    // if (sceneAssetPendingTagQuery.length > 0) {
+    createMap(entity, json.props as MapComponentType)
+    // }
+
+    // if (getState(EngineState).isEditor) {
+    //   const components = getAllComponents(entity)
+    //   components.push(SCENE_COMPONENT_MAP)
+    // }
   }
 }
 
 export const createMap = async (entity: Entity, args: MapComponentType) => {
-  if(Engine.isEditor && hasComponent(entity, MapComponent)) {
+  console.log('create_map_1')
+  if (getState(EngineState).isEditor && hasComponent(entity, MapComponent)) {
     _updateMap(entity, args)
     return
   }
   // TODO: handle "navigator.geolocation.getCurrentPosition" rejection?
-
   addComponent(entity, MapComponent, args)
   const center = await getStartCoords(args)
 
-  const mapObject3D = new Group()
+  const mapObject3D = new Object3D() as Object3DWithEntity
   const navigationRaycastTarget = new Group()
 
   mapObject3D.name = '(Geographic) Map'
 
-  addComponent(entity, Object3DComponent, {
-    value: mapObject3D
-  })
+  addComponent(entity, GroupComponent, [mapObject3D])
+
   if (args.enableDebug) {
-    addComponent(entity, DebugNavMeshComponent, { object3d: new Group() })
+    // addComponent(entity, DebugNavMeshComponent, { object3d: new Group() })
   }
 
-  const state = mapReducer(null, MapAction.initialize(center, args.scale?.x))
+  console.log('map_functions_create_map')
 
-  // TODO fix hardcoded URL
-  const spinnerGLTF = await LoadGLTF(Engine.publicPath + '/projects/XREngine-Project-Maps/EarthLowPoly.glb')
-  const spinner = spinnerGLTF.scene as Mesh
-  spinner.position.y = avatarHalfHeight * 2
-  spinner.position.z = -150
-  state.updateSpinner = spinner
+  MapStateService.initializeMap(center, args.scale?.x)
+
+  const state = getMutableState(MapState)
+
+  // const spinnerGLTF = getState(EngineState).publicPath + '/projects/ee-maps/EarthLowPoly.glb'
+  // const spinner = spinnerGLTF as Mesh
+  // spinner.position.y = defaultAvatarHalfHeight * 2
+  // spinner.position.z = -150
+  // state.updateSpinner = spinner
 
   const updateTextContainer = new Text()
 
@@ -76,12 +96,11 @@ export const createMap = async (entity: Entity, args: MapComponentType) => {
 
   updateTextContainer.sync()
 
-  state.updateTextContainer = updateTextContainer
+  const tempState = { ...state.value, updateTextContainer }
+  await startPhases(tempState, await getPhases({ exclude: ['navigation'] }))
 
-  await startPhases(state, await getPhases({ exclude: ['navigation'] }))
-
-  navigationRaycastTarget.scale.setScalar(state.scale)
-  Engine.scene.add(navigationRaycastTarget)
+  navigationRaycastTarget.scale.setScalar(state.scale.value)
+  Engine.instance.scene.add(navigationRaycastTarget)
 
   addComponent(entity, NavMeshComponent, {
     /*
@@ -93,30 +112,37 @@ export const createMap = async (entity: Entity, args: MapComponentType) => {
 }
 
 export const _updateMap = async (entity: Entity, props: any) => {
-
   // only update on some property changes
-  if(!(
-    Object.keys(props).includes('startLatitude')
-    || Object.keys(props).includes('startLongitude')
-    || Object.keys(props).includes('useDeviceGeolocation'))
-  ) return
+
+  // if (
+  //   !(
+  //     Object.keys(props).includes('startLatitude') ||
+  //     Object.keys(props).includes('startLongitude') ||
+  //     Object.keys(props).includes('useDeviceGeolocation')
+  //   )
+  // )
+  //   return
+
+  console.log('_updatemap')
 
   const args = getComponent(entity, MapComponent)
   const center = await getStartCoords(args)
+  console.log('center->', center)
   const subSceneChildren = []
   const subScene = this as unknown as Object3D
 
-  const state = mapReducer(null, MapAction.initialize(center, args.scale?.x))
+  MapStateService.initializeMap(center, args.scale?.x)
+  const state = getMutableState(MapState)
 
-  await startPhases(state, await getPhases({ exclude: ['navigation'] }))
+  await startPhases(state.value, await getPhases({ exclude: ['navigation'] }))
 
-  for (const object of state.completeObjects.values()) {
+  for (const object of state.completeObjects.value.values()) {
     if (object.mesh) {
       setPosition(object.mesh, object.centerPoint)
       addChildFast(subScene, object.mesh, subSceneChildren)
     }
   }
-  for (const object of state.labelCache.values()) {
+  for (const object of state.labelCache.value.values()) {
     if (object.mesh) {
       setPosition(object.mesh, object.centerPoint)
       addChildFast(subScene, object.mesh, subSceneChildren)
@@ -125,23 +151,8 @@ export const _updateMap = async (entity: Entity, props: any) => {
   }
   subScene.children = subSceneChildren
 }
-export const updateMap = debounce((entity, args) => _updateMap(entity, args), 500) as any as (entity: Entity, props: any) => void
 
-export const serializeMap = (entity: Entity) => {
-  const mapComponent = getComponent(entity, MapComponent)
-  return {
-    name: SCENE_COMPONENT_MAP,
-    props: {
-      apiKey: mapComponent.apiKey,
-      name: mapComponent.name,
-      scale: mapComponent.scale,
-      useTimeOfDay: mapComponent.useTimeOfDay,
-      useDirectionalShadows: mapComponent.useDirectionalShadows,
-      useDeviceGeolocation: mapComponent.useDeviceGeolocation,
-      startLatitude: mapComponent.startLatitude,
-      startLongitude: mapComponent.startLongitude,
-      showRasterTiles: mapComponent.showRasterTiles,
-      enableDebug: mapComponent.enableDebug
-    }
-  }
-}
+export const updateMap = debounce((entity, args) => _updateMap(entity, args), 500) as any as (
+  entity: Entity,
+  props: any
+) => void

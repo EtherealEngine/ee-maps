@@ -4,6 +4,7 @@ import { multiPolygon, polygon } from '@turf/turf'
 
 /** Useful for when a feature is split across multiple vector tiles */
 export default function unifyFeatures(features: Feature[]): Feature {
+  console.log("unifyFeature__FN");
   if (features.length > 1) {
     const allCoords = features.map(getCoords)
 

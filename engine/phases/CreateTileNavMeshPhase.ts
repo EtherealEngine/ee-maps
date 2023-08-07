@@ -82,6 +82,7 @@ const createNavMeshUsingCache = createUsingCache((state: MapStateUnwrapped, key:
 })
 
 export function getTaskKeys(state: MapStateUnwrapped) {
+  console.log('CreateNavMeshPhase--->')
   return createSurroundingTileIterator(state.center, state.navMeshRadius, TILE_ZOOM)
 }
 
@@ -93,6 +94,7 @@ export function setTaskStatus(state: MapStateUnwrapped, key: TileKey, status: Ta
 }
 
 export function execTask(state: MapStateUnwrapped, key: TileKey) {
+  console.log('CreateNavMeshPhase_2--->')
   return createNavMeshUsingCache(state.tileNavMeshCache, state, key)
 }
 

@@ -1,14 +1,13 @@
+import { prefabIcons } from '@etherealengine/editor/src/functions/PrefabEditors'
+import { startSystem } from '@etherealengine/engine/src/ecs/functions/SystemFunctions'
 
-import { EntityNodeEditor, prefabIcons } from '@etherealengine/editor/src/functions/PrefabEditors'
-import { MapNodeEditor } from './MapNodeEditor'
 import MapIcon from '@mui/icons-material/Map'
-import { map } from '../worldInjection'
-import { World } from '@etherealengine/engine/src/ecs/classes/World'
+
 import MapUpdateSystem from '../engine/MapUpdateSystem'
+import { GEO_MAP } from '../worldInjection'
 
-EntityNodeEditor[map] = MapNodeEditor
-prefabIcons[map] = MapIcon
+export default async () => {
+  prefabIcons[GEO_MAP] = MapIcon
 
-export default async (world: World) => {
-  return await MapUpdateSystem(world)
+  startSystem(MapUpdateSystem, {})
 }

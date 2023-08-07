@@ -9,6 +9,7 @@ export const isAsyncPhase = false
 export const isCachingPhase = true
 
 export function getTaskKeys(state: MapStateUnwrapped) {
+  console.log('ExtractTileFeaturesPhase--->')
   console.log('tileCache size', state.tileCache.size)
   return state.tileCache.keys()
 }
@@ -21,6 +22,7 @@ export function setTaskStatus(state: MapStateUnwrapped, key: TileKey, status: Ta
 }
 
 export function execTask(state: MapStateUnwrapped, tileKey: TileKey) {
+  console.log('ExtractTileFeaturesPhase_2--->')
   const vectorTile = state.tileCache.get(tileKey)
   const [x, y] = tileKey
   if (vectorTile) {

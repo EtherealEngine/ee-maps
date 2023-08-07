@@ -1,6 +1,7 @@
+import { isClient } from '@etherealengine/engine/src/common/functions/getEnvironment'
+
 import { TaskStatus } from '../types'
 import { ICachingPhase, IPhase, ISyncPhase, MapStateUnwrapped } from '../types'
-import { isClient } from '@etherealengine/engine/src/common/functions/isClient'
 
 // Random Thought: Monads like https://github.com/monet/monet.js/blob/master/docs/FREE.md could be useful here.
 type FeatureId = 'navigation'
@@ -55,11 +56,13 @@ Object.freeze(defaultPhases)
 Object.freeze(phasesNoNavigation)
 
 export async function getPhases(options: { exclude?: FeatureId[] } = {}): Promise<readonly IPhase<any, any>[]> {
+  console.log('GETPHASES-PHASES-CALLED--->')
   const exclude = options.exclude || []
   return Promise.all(exclude.includes('navigation') ? phasesNoNavigation : defaultPhases)
 }
 
 export function resetPhases(state: MapStateUnwrapped, phases: readonly IPhase<any, any>[]) {
+  console.log('RESET-PHASES-CALLED--->')
   for (const phase of phases) {
     phase.reset(state)
   }
@@ -67,30 +70,32 @@ export function resetPhases(state: MapStateUnwrapped, phases: readonly IPhase<an
 
 export async function startPhases(state: MapStateUnwrapped, phases: readonly IPhase<any, any>[]) {
   // TODO remove
+  console.log('START-PHASES-CALLED--->')
   const results = [] as any[]
   let result: any
+  const newState = { ...state }
 
   for (const phase of phases) {
     // console.log("starting phase", phase.name)
     const keys = phase.getTaskKeys(state)
     if (phase.isCachingPhase || phase.isAsyncPhase) {
-      state.activePhase = phase.name
+      newState.activePhase = phase.name
       // TODO remove
       const promises = [] as Promise<any>[]
       let promise: Promise<any>
       for (const key of keys) {
-        const taskStatus = phase.getTaskStatus(state, key)
+        const taskStatus = phase.getTaskStatus(newState, key)
         // console.log(`task key: ${key} status: ${taskStatus === TaskStatus.STARTED ? 'started' : 'not started'}`)
         if (taskStatus === TaskStatus.NOT_STARTED) {
           // console.log("starting task for", phase.name)
           if (phase.isAsyncPhase) {
-            promise = phase.startTask(state, key)
+            promise = phase.startTask(newState, key)
             promises.push(promise)
           } else {
-            result = (phase as ICachingPhase<any, any>).execTask(state, key)
+            result = (phase as ICachingPhase<any, any>).execTask(newState, key)
             results.push(result)
           }
-          ;(phase as ICachingPhase<any, any>).setTaskStatus(state, key, TaskStatus.STARTED)
+          ;(phase as ICachingPhase<any, any>).setTaskStatus(newState, key, TaskStatus.STARTED)
         }
       }
       results.push(...(await Promise.all(promises)))
@@ -98,12 +103,12 @@ export async function startPhases(state: MapStateUnwrapped, phases: readonly IPh
       for (const key of keys) {
         // console.log(`task key: ${key}`)
         // console.log("starting task", phase.name)
-        result = (phase as ISyncPhase<any, any>).execTask(state, key)
+        result = (phase as ISyncPhase<any, any>).execTask(newState, key)
         results.push(result)
       }
     }
-    phase.cleanup(state)
+    phase.cleanup(newState)
   }
-  state.activePhase = 'UpdateScene'
+  newState.activePhase = 'UpdateScene'
   return results
 }
